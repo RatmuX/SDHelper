@@ -62,12 +62,16 @@ object ArchitectureRules {
                 to.startsWith(":core:")
             }
 
+            from == ":ui:components" -> {
+                to == ":ui:design-api" || to.startsWith(":core:")
+            }
+
             from.startsWith(":ui:design-") -> {
                 to == ":ui:design-api" || to.startsWith(":core:")
             }
 
             from.startsWith(":feature:") -> {
-                to == ":ui:design-api" || to.startsWith(":core:") || to.startsWith(":data:")
+                to == ":ui:design-api" || to == ":ui:components" || to.startsWith(":core:") || to.startsWith(":data:")
             }
 
             from.startsWith(":data:") -> {

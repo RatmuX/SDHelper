@@ -11,7 +11,7 @@ Goal: adding a design language means a new design module and a one-line flavor s
 
 **Tokens**: color roles (surface, onSurface, primary, accent for toggled state, danger…), typography roles (title, body, label), shapes, spacing scale. Each design module maps these to its own theme.
 
-**Semantic components** (contracts, not wrappers of one library): `DeckScaffold` (with optional back action), `DeckCard`, `DeckButton` (primary/secondary), `DeckTextField`, `DeckListItem`, `DeckDialog`, `DeckStatusMessage` (neutral/positive/warning/error), `DeckProgress`, `DeckText` (title/body/caption). Planned: `DeckSwitch`, `DeckSettingsGroup`, `DeckButtonTile` for the deck grid. Provided through a `CompositionLocal` holding a `DesignSystem` interface.
+**Semantic components** (contracts, not wrappers of one library): `DeckScaffold` (with optional back action), `DeckCard`, `DeckButton` (primary/secondary), `DeckTextField`, `DeckListItem`, `DeckDialog`, `DeckStatusMessage` (neutral/positive/warning/error), `DeckProgress`, `DeckText` (title/body/caption), `DeckBackground`, `DeckButtonTile` (large square control-panel button with icon, title, live label, tone, dimmed when unavailable, highlight for drop targets), `DeckEmptyTile`, `DeckPageIndicator`, `DeckSwitchRow`, `DeckModal` (dialog with scrollable content). Planned: `DeckSettingsGroup`. The built-in icon set (`DeckIconSet`, `DeckIcon`) lives in the contract module as vector drawables, so every design language draws the same icons in its own colors. Provided through a `CompositionLocal` holding a `DesignSystem` interface.
 
 **Navigation chrome** is part of the contract at the scaffold level (top bar, back action, optional bottom bar). Navigation logic itself (Navigation 3) stays in features.
 

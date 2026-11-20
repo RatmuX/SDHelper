@@ -42,6 +42,8 @@ core/plugin-api              ActionProvider, manifest, parameter schema (Kotlin/
 core/common                  tiny helpers only
 ui/design-api                tokens and semantic component contracts (Android library)
 ui/design-m3                 Material 3 implementation
+ui/components                shared building blocks made from the contract only: grid geometry, grid page, button models,
+                             landscape/immersive effect, drag gestures (features may use it; it may use only design-api and core)
 ui/design-miuix              Miuix implementation (later, Phase 5)
 feature/home                 launcher of surfaces
 feature/deck                 control panel

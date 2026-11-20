@@ -1,5 +1,6 @@
 package io.github.ratmux.sdhelper.ui.designapi
 
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -9,6 +10,9 @@ import androidx.compose.ui.Modifier
 
 /** Visual weight of a button. */
 enum class DeckEmphasis { PRIMARY, SECONDARY }
+
+/** How a button tile looks, as a meaning; every design language maps it to its own colors. */
+enum class DeckTileTone { NORMAL, ACTIVE, WARNING, ALERT }
 
 /** Typographic role of a piece of text. */
 enum class DeckTextStyle { TITLE, BODY, CAPTION }
@@ -97,6 +101,64 @@ interface DesignSystem {
         text: String,
         style: DeckTextStyle,
         modifier: Modifier,
+    )
+
+    /**
+     * A large square button of the control panel. The caller decides its size through [modifier]. With a null
+     * [onClick] the tile is only shown (editor); [highlighted] marks a drop target; a disabled tile is dimmed.
+     */
+    @Composable
+    fun ButtonTile(
+        title: String,
+        iconKey: String?,
+        toggled: Boolean?,
+        label: String?,
+        tone: DeckTileTone,
+        enabled: Boolean,
+        highlighted: Boolean,
+        onClick: (() -> Unit)?,
+        modifier: Modifier,
+    )
+
+    /** The full-screen background of a screen without an app bar (the control panel). */
+    @Composable
+    fun Background(
+        modifier: Modifier,
+        content: @Composable () -> Unit,
+    )
+
+    /** An empty grid cell as shown in the editor; [highlighted] marks a drop target. */
+    @Composable
+    fun EmptyTile(
+        highlighted: Boolean,
+        modifier: Modifier,
+    )
+
+    @Composable
+    fun PageIndicator(
+        count: Int,
+        current: Int,
+        modifier: Modifier,
+    )
+
+    /** A row with a label and a switch; the whole row toggles. */
+    @Composable
+    fun SwitchRow(
+        label: String,
+        checked: Boolean,
+        onCheckedChange: (Boolean) -> Unit,
+        modifier: Modifier,
+    )
+
+    /** A dialog with arbitrary scrollable [content]. [confirmText] and [dismissText] are optional buttons. */
+    @Composable
+    fun Modal(
+        title: String,
+        onDismiss: () -> Unit,
+        confirmText: String?,
+        onConfirm: (() -> Unit)?,
+        dismissText: String?,
+        content: @Composable ColumnScope.() -> Unit,
     )
 }
 
@@ -189,3 +251,54 @@ fun DeckText(
     modifier: Modifier = Modifier,
     style: DeckTextStyle = DeckTextStyle.BODY,
 ) = LocalDesignSystem.current.Text(text, style, modifier)
+
+@Composable
+fun DeckButtonTile(
+    title: String,
+    modifier: Modifier = Modifier,
+    iconKey: String? = null,
+    toggled: Boolean? = null,
+    label: String? = null,
+    tone: DeckTileTone = DeckTileTone.NORMAL,
+    enabled: Boolean = true,
+    highlighted: Boolean = false,
+    onClick: (() -> Unit)? = null,
+) = LocalDesignSystem.current.ButtonTile(title, iconKey, toggled, label, tone, enabled, highlighted, onClick, modifier)
+
+@Composable
+fun DeckBackground(
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit,
+) = LocalDesignSystem.current.Background(modifier, content)
+
+@Composable
+fun DeckEmptyTile(
+    modifier: Modifier = Modifier,
+    highlighted: Boolean = false,
+) = LocalDesignSystem.current.EmptyTile(highlighted, modifier)
+
+@Composable
+fun DeckPageIndicator(
+    count: Int,
+    current: Int,
+    modifier: Modifier = Modifier,
+) = LocalDesignSystem.current.PageIndicator(count, current, modifier)
+
+@Composable
+fun DeckSwitchRow(
+    label: String,
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
+    modifier: Modifier = Modifier,
+) = LocalDesignSystem.current.SwitchRow(label, checked, onCheckedChange, modifier)
+
+@Composable
+fun DeckModal(
+    title: String,
+    onDismiss: () -> Unit,
+    modifier: Modifier = Modifier,
+    confirmText: String? = null,
+    onConfirm: (() -> Unit)? = null,
+    dismissText: String? = null,
+    content: @Composable ColumnScope.() -> Unit,
+) = LocalDesignSystem.current.Modal(title, onDismiss, confirmText, onConfirm, dismissText, content)

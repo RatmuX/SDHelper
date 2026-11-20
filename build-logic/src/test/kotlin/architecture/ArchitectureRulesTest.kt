@@ -79,6 +79,25 @@ class ArchitectureRulesTest {
     }
 
     @Test
+    fun `shared ui components sit between the design contract and the features`() {
+        val ok =
+            listOf(
+                module(":ui:components", setOf(":ui:design-api", ":core:model")),
+                module(":feature:deck", setOf(":ui:components", ":ui:design-api", ":core:model")),
+            )
+        assertEquals(emptyList(), ArchitectureRules.checkDependencies(ok))
+
+        val bad =
+            listOf(
+                module(":ui:components", setOf(":ui:design-m3")),
+                module(":ui:components", setOf(":feature:deck")),
+                module(":ui:components", external = setOf("androidx.compose.material3:material3")),
+                module(":ui:design-api", setOf(":ui:components")),
+            )
+        assertEquals(4, ArchitectureRules.checkDependencies(bad).size)
+    }
+
+    @Test
     fun `core must not depend on non-core modules`() {
         val violations =
             ArchitectureRules.checkDependencies(

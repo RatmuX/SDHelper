@@ -1,14 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="actions_title">Kontrol Paneli</string>
-    <string name="actions_not_connected">Bir bilgisayara bağlı değilsin.</string>
-    <string name="actions_open_computers">Bilgisayarları aç</string>
-    <string name="actions_connecting">Bağlanılıyor…</string>
-    <string name="actions_signing_in">Giriş yapılıyor…</string>
-    <string name="actions_empty">Bu bilgisayar hiç eylem sunmuyor.</string>
-    <string name="actions_unavailable">Şu an kullanılamıyor</string>
-    <string name="actions_on">Açık</string>
-    <string name="actions_off">Kapalı</string>
-    <string name="actions_error_not_connected">Bağlantı koptu. Biraz sonra tekrar dene.</string>
-    <string name="actions_error_refused">Bilgisayar bunu yapamadı: %1$s</string>
+    <string name="deck_choose_layout">Düzen</string>
+    <string name="deck_close">Kapat</string>
+    <string name="deck_active">Etkin</string>
+    <string name="deck_page_count">%1$d sayfa</string>
+    <string name="deck_not_connected">Bağlı değil</string>
+    <string name="deck_message_not_connected">Bağlantı koptu.</string>
+    <string name="deck_message_refused">Bilgisayar bunu yapamadı: %1$s</string>
 </resources>

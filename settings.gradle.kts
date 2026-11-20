@@ -24,6 +24,7 @@ include(
     ":core:common",
     ":ui:design-api",
     ":ui:design-m3",
+    ":ui:components",
     ":feature:home",
     ":feature:deck",
     ":feature:deck-editor",

@@ -6,5 +6,7 @@ import org.koin.dsl.module
 /** Koin module of this feature's view models. */
 val deckFeatureModule =
     module {
-        viewModel { ActionsViewModel(deck = get(), status = get()) }
+        viewModel {
+            DeckViewModel(profiles = get(), cache = get(), deck = get(), status = get(), settings = get())
+        }
     }
