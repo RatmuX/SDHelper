@@ -1,6 +1,7 @@
 package io.github.ratmux.sdhelper.data.connection
 
 import android.os.Build
+import android.util.Log
 import io.github.ratmux.sdhelper.core.model.ComputerDiscovery
 import io.github.ratmux.sdhelper.core.model.ConnectionStatus
 import io.github.ratmux.sdhelper.core.model.DeckActions
@@ -22,7 +23,9 @@ val connectionModule =
         single { DefaultConnectionManager(keys = get(), deviceName = { Build.MODEL }, scope = get(APP_SCOPE)) }
         single<ConnectionStatus> { get<DefaultConnectionManager>() }
         single<DeckTransport> { get<DefaultConnectionManager>() }
-        single<DeckActions> { DefaultDeckActions(get(), get(), get(APP_SCOPE)) }
+        single<DeckActions> {
+            DefaultDeckActions(get(), get(), get(APP_SCOPE), log = { message -> Log.d("SDHelper", message) })
+        }
         single<PairingClient> { DefaultPairingClient(get()) { Build.MODEL } }
         single<ComputerDiscovery> { NsdComputerDiscovery(androidContext()) }
         single(createdAtStart = true) {

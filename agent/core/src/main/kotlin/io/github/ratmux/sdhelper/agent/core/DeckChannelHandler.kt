@@ -53,7 +53,7 @@ class DeckChannelHandler(
         device: PairedDevice,
         message: Envelope,
     ): List<Envelope> =
-        when (message.type) {
+        when (message.also { LOG.fine("deck message ${it.type} from ${device.name}") }.type) {
             DeckTypes.CATALOG_GET -> {
                 listOf(deckMessage(DeckTypes.CATALOG, Catalog(registry.catalog()), message.id)) +
                     states.value.map { (id, state) -> stateMessage(id, state) }
@@ -90,7 +90,12 @@ class DeckChannelHandler(
         ) {
             return InvokeResult(false, "invalid parameters")
         }
-        val entry = registry.find(request.actionId) ?: return InvokeResult(false, "unknown action")
+        val entry =
+            registry.find(request.actionId)
+                ?: return InvokeResult(
+                    false,
+                    "unknown action",
+                ).also { LOG.info("invoke ${request.actionId} -> unknown action") }
 
         val result =
             try {
@@ -101,11 +106,14 @@ class DeckChannelHandler(
                 LOG.log(Level.WARNING, "Action ${request.actionId} failed", e)
                 ActionResult.Failure("action failed")
             }
-        return when (result) {
-            null -> InvokeResult(false, "timed out")
-            ActionResult.Success -> InvokeResult(true)
-            is ActionResult.Failure -> InvokeResult(false, result.message)
-        }
+        val outcome =
+            when (result) {
+                null -> InvokeResult(false, "timed out")
+                ActionResult.Success -> InvokeResult(true)
+                is ActionResult.Failure -> InvokeResult(false, result.message)
+            }
+        LOG.info("invoke ${request.actionId} -> ${if (outcome.ok) "ok" else "failed: ${outcome.error}"}")
+        return outcome
     }
 
     private fun broadcast(message: Envelope) {

@@ -48,6 +48,8 @@ class DefaultDeckActions(
     scope: CoroutineScope,
     private val language: () -> String = { Locale.getDefault().language },
     private val timeoutMillis: Long = INVOKE_TIMEOUT_MILLIS,
+    /** Diagnostic messages (action ids and outcomes only); the app routes them to logcat. */
+    private val log: (String) -> Unit = {},
 ) : DeckActions {
     private val currentActions = MutableStateFlow<List<DeckAction>>(emptyList())
     private val currentStates = MutableStateFlow<Map<String, DeckActionState>>(emptyMap())
@@ -67,6 +69,7 @@ class DefaultDeckActions(
                 .distinctUntilChanged()
                 .collect { isConnected ->
                     connected = isConnected
+                    log("connection ${if (isConnected) "up, asking for the catalog" else "down, clearing actions"}")
                     if (isConnected) {
                         transport.send(Envelope(Protocol.VERSION, Channels.DECK, DeckTypes.CATALOG_GET, id = "catalog"))
                     } else {
@@ -78,18 +81,25 @@ class DefaultDeckActions(
     }
 
     override suspend fun invoke(actionId: String): InvokeOutcome {
-        if (!connected) return InvokeOutcome.NotConnected
+        if (!connected) {
+            log("invoke $actionId: not connected")
+            return InvokeOutcome.NotConnected
+        }
         val id = UUID.randomUUID().toString()
         val reply = CompletableDeferred<InvokeResult>()
         pending[id] = reply
         try {
-            if (!transport.send(
-                    deckMessage(DeckTypes.INVOKE, Invoke(actionId), id = id),
-                )
-            ) {
+            val request = deckMessage(DeckTypes.INVOKE, Invoke(actionId), id = id)
+            if (!transport.send(request)) {
+                log("invoke $actionId: could not send")
                 return InvokeOutcome.NotConnected
             }
-            val result = withTimeoutOrNull(timeoutMillis) { reply.await() } ?: return InvokeOutcome.Failure("timed out")
+            val result = withTimeoutOrNull(timeoutMillis) { reply.await() }
+            if (result == null) {
+                log("invoke $actionId: no answer within ${timeoutMillis / MILLIS} s")
+                return InvokeOutcome.Failure("timed out")
+            }
+            log("invoke $actionId: ${if (result.ok) "ok" else "refused: ${result.error}"}")
             return if (result.ok) InvokeOutcome.Success else InvokeOutcome.Failure(result.error ?: "failed")
         } finally {
             pending.remove(id)
@@ -100,6 +110,7 @@ class DefaultDeckActions(
         if (message.channel != Channels.DECK) return
         // A message the phone cannot read is ignored: it must not break the connection.
         runCatching {
+            log("received deck/${message.type}")
             when (message.type) {
                 DeckTypes.CATALOG -> {
                     currentActions.value = message.payloadAs<Catalog>().actions.map(::toAction)
@@ -134,6 +145,7 @@ class DefaultDeckActions(
         )
 
     private companion object {
+        const val MILLIS = 1000
         const val INVOKE_TIMEOUT_MILLIS = 10_000L
     }
 }
