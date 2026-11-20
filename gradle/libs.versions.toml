@@ -7,6 +7,10 @@ activityCompose = "1.13.0"
 coreKtx = "1.19.1"
 coroutines = "1.11.0"
 serialization = "1.13.0"
+ktor = "3.6.1"
+jmdns = "3.6.5"
+slf4j = "2.0.20"
+zxing = "3.5.4"
 spotless = "8.11.0"
 ktlint = "1.8.0"
 junit = "4.13.2"
@@ -30,7 +34,18 @@ androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "coreKtx"
 
 # Kotlin libraries
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
+kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }
+
+# Networking (agent)
+ktor-server-netty = { module = "io.ktor:ktor-server-netty", version.ref = "ktor" }
+ktor-server-websockets = { module = "io.ktor:ktor-server-websockets", version.ref = "ktor" }
+ktor-network-tls-certificates = { module = "io.ktor:ktor-network-tls-certificates", version.ref = "ktor" }
+ktor-client-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktor" }
+ktor-client-websockets = { module = "io.ktor:ktor-client-websockets", version.ref = "ktor" }
+jmdns = { module = "org.jmdns:jmdns", version.ref = "jmdns" }
+slf4j-simple = { module = "org.slf4j:slf4j-simple", version.ref = "slf4j" }
+zxing-core = { module = "com.google.zxing:core", version.ref = "zxing" }
 
 # Tests
 kotlin-test-junit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }

@@ -66,6 +66,19 @@ class ArchitectureRulesTest {
     }
 
     @Test
+    fun `agent server may use agent core but not platform modules, and core must not use the server`() {
+        val ok = listOf(module(":agent:server", setOf(":agent:core", ":core:protocol")))
+        assertEquals(emptyList(), ArchitectureRules.checkDependencies(ok))
+
+        val bad =
+            listOf(
+                module(":agent:server", setOf(":agent:platform-windows")),
+                module(":agent:core", setOf(":agent:server")),
+            )
+        assertEquals(2, ArchitectureRules.checkDependencies(bad).size)
+    }
+
+    @Test
     fun `core must not depend on non-core modules`() {
         val violations =
             ArchitectureRules.checkDependencies(

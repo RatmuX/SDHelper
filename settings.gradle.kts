@@ -33,6 +33,7 @@ include(
     ":data:devices",
     ":app:android",
     ":agent:core",
+    ":agent:server",
     ":agent:platform-windows",
     ":agent:desktop-app",
 )

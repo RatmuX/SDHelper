@@ -11,3 +11,5 @@ Format: Context, Decision, Alternatives, Consequences. Status: Accepted unless n
 | [0005](ADR-0005-transport-security.md) | Transport: TLS WebSocket with pinned certificate |
 | [0006](ADR-0006-plugin-model.md) | Plugins: out-of-process, JSON-RPC over stdio |
 | [0007](ADR-0007-license-scope.md) | Apache-2.0, Windows plus Android first |
+| [0008](ADR-0008-tls-pairing-details.md) | TLS identity, pairing and authentication details |
+| [0009](ADR-0009-agent-ui-swing.md) | Temporary Swing agent interface and a console mode |

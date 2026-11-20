@@ -78,6 +78,10 @@ object ArchitectureRules {
                 to.startsWith(":core:")
             }
 
+            from == ":agent:server" -> {
+                to == ":agent:core" || to.startsWith(":core:")
+            }
+
             from.startsWith(":agent:platform-") -> {
                 to == ":agent:core" || to.startsWith(":core:")
             }

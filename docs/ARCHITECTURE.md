@@ -48,9 +48,11 @@ feature/deck                 control panel
 feature/deck-editor          layout, pages, folders, profiles, action editing
 feature/connection           discovery, pairing, devices
 feature/settings
-data/profiles, data/devices  Room, DataStore, repositories
+data/profiles, data/devices  storage: Room (profiles), DataStore (paired computers); implement interfaces from core:model
+data/connection              phone side of the protocol: TLS pinning, Keystore key, connection manager, discovery
 app/android                  composition root; build flavor selects the design module
-agent/core                   platform-independent agent logic and port interfaces
+agent/core                   platform-independent agent logic: pairing, authentication, session state machine, channel registry, ports
+agent/server                 Ktor/Netty TLS WebSocket transport and mDNS announcement
 agent/platform-windows       ports implemented through the native helper
 agent/desktop-app            tray, settings window, packaging
 plugins/builtin-*            built-in plugins (system-audio, media, discord)
@@ -61,7 +63,7 @@ native/windows               Rust helper
 Dependency rules (enforced, see section 8):
 - `feature:*` → `ui:design-api`, `core:*`, `data:*` interfaces. Never `design-m3`, `design-miuix`, `material3` or `miuix`.
 - Only `app:android` wires a concrete design module.
-- `agent:core` never depends on `agent:platform-*`; `agent:desktop-app` wires them.
+- `agent:core` never depends on `agent:platform-*` or `agent:server`; `agent:server` depends only on `agent:core` and `core:*`; `agent:desktop-app` wires everything.
 - `core:*` depends on nothing platform-specific.
 
 ## 4. Agent port interfaces (Linux readiness)
