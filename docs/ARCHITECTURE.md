@@ -1,6 +1,6 @@
 # SDHelper Architecture
 
-Status: Phase 1 design. Versions in this document are research results and must be re-verified on Maven Central when the build is created (Phase 2).
+Status: Phase 2 skeleton implemented. Versions are pinned in `gradle/libs.versions.toml` (verified 2026-11-20).
 
 ## 1. Overview
 
@@ -36,9 +36,9 @@ Verified: SMTC is exposed through `Windows.Media.Control.GlobalSystemMediaTransp
 
 ```
 build-logic/                 convention plugins
-core/model                   Action, Button, Page, Folder, Profile, Device (pure Kotlin, KMP)
-core/protocol                message types, versions, channels, serialization (KMP)
-core/plugin-api              ActionProvider, manifest, parameter schema (KMP)
+core/model                   Action, Button, Page, Folder, Profile, Device (pure Kotlin/JVM)
+core/protocol                message types, versions, channels, serialization (Kotlin/JVM)
+core/plugin-api              ActionProvider, manifest, parameter schema (Kotlin/JVM)
 core/common                  tiny helpers only
 ui/design-api                tokens and semantic component contracts (Android library)
 ui/design-m3                 Material 3 implementation
@@ -97,11 +97,13 @@ Built-in actions run behind the same `ActionProvider` interface as external plug
 
 ## 8. Architecture enforcement
 
-1. Convention plugin for feature modules rejects dependencies on `design-*`, `material3`, `miuix`.
-2. detekt `ForbiddenImport` blocks `androidx.compose.material3.*` and `top.yukonga.miuix.*` in `feature/**` and `core/**`.
-3. A Gradle task/test checks the module graph for cycles and direction.
-4. `agent:core` must not depend on `agent:platform-*`.
-All four run in CI; a violation fails the build.
+Implemented in `build-logic` (`sdhelper.root` plugin, rules in `architecture/ArchitectureRules.kt`, unit-tested):
+1. `verifyDependencies` checks every module's declared dependencies: direction rules per layer, no feature-to-feature dependencies, `agent:core` never depends on `agent:platform-*`, no dependency cycles, and no `material3`/`miuix` artifacts outside `ui:design-*` and `app:*`.
+2. `verifyImports` (one task per module) rejects `import androidx.compose.material3...` and `import top.yukonga.miuix...` outside `ui:design-*` and `app:*`.
+3. The feature convention plugin (`sdhelper.android-feature`) gives features only `ui:design-api` and `core:model` by default.
+All of these run in `./gradlew check` and CI; a violation fails the build.
+
+detekt's `ForbiddenImport` was the original plan, but detekt 1.23.x targets an old Kotlin compiler and 2.x is still alpha (verified 2026-11-20), so a small own check is more reliable with Kotlin 2.4. Style is enforced with Spotless + ktlint.
 
 ## 9. Design flavors (ADR-0003)
 

@@ -1,27 +1,44 @@
 # Build outputs
 build/
 .gradle/
+.kotlin/
+.cxx/
+.externalNativeBuild/
+captures/
 *.apk
 *.aab
 *.msi
 target/
 
-# IDE
+# IDE and editors
 .idea/
 *.iml
 .vscode/
+.fleet/
+*.swp
+*~
 
 # Secrets and local config (never commit)
 local.properties
+keystore.properties
 *.jks
 *.keystore
+*.p12
+*.pfx
 *.pem
 *.key
 .env
+.env.*
+
+# Logs and crash dumps
+*.log
+hs_err_pid*
+*.hprof
 
 # OS
 .DS_Store
 Thumbs.db
 
-# Working notes
+# Claude Code local settings and working notes
+.claude/settings.local.json
 claude-code-prompt.md

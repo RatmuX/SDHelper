@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="home_title">SDHelper</string>
+    <string name="surface_deck_title">Control Panel</string>
+    <string name="surface_deck_subtitle">Use your shortcut buttons</string>
+    <string name="surface_editor_title">Edit Shortcuts</string>
+    <string name="surface_editor_subtitle">Arrange pages, folders and profiles</string>
+</resources>

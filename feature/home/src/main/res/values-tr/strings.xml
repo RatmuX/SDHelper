@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="home_title">SDHelper</string>
+    <string name="surface_deck_title">Kontrol Paneli</string>
+    <string name="surface_deck_subtitle">Kısayol tuşlarını kullan</string>
+    <string name="surface_editor_title">Kısayolları Düzenle</string>
+    <string name="surface_editor_subtitle">Sayfaları, klasörleri ve profilleri düzenle</string>
+</resources>

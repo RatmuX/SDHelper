@@ -3,9 +3,9 @@
 ## Phases
 | Phase | Content |
 |---|---|
-| 0 | Requirements (done) |
-| 1 | Research and design documents (this) |
-| 2 | Skeleton: Gradle, version catalog, convention plugins, CI, lint, architecture tests, "hello" Android app and agent start |
+| 0 (done) | Requirements |
+| 1 (done) | Research and design documents |
+| 2 (done) | Skeleton: Gradle, version catalog, convention plugins, CI, lint, architecture tests, "hello" Android app and agent start |
 | 3 | Vertical slice: home menu, pairing, connection, deck grid, 2-3 real actions (system volume, mic mute, media), basic editor |
 | 4 | Plugin system: manifest, out-of-process host, permission prompt, generated parameter UI, built-ins moved to plugins, one Python example plugin, developer guide |
 | 5 | Polish: Discord actions, state feedback everywhere, packaging (APK, Windows installer), Miuix flavor proof, README, screenshots, release process |
