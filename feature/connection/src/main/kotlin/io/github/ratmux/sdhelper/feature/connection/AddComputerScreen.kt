@@ -78,7 +78,8 @@ fun AddComputerScreen(
                             .setDesiredBarcodeFormats(ScanOptions.QR_CODE)
                             .setPrompt(scanPrompt)
                             .setBeepEnabled(false)
-                            .setOrientationLocked(false),
+                            .setOrientationLocked(false)
+                            .setCaptureActivity(AnyOrientationCaptureActivity::class.java),
                     )
                 },
                 modifier = Modifier.fillMaxWidth(),
