@@ -4,7 +4,9 @@
     <string name="surface_deck_title">Kontrol Paneli</string>
     <string name="surface_deck_subtitle">Kısayol tuşlarını kullan</string>
     <string name="surface_editor_title">Kısayolları Düzenle</string>
-    <string name="surface_editor_subtitle">Sayfaları, klasörleri ve profilleri düzenle</string>
+    <string name="surface_editor_subtitle">Tuşları ve sayfaları sürükle-bırak ile düzenle</string>
     <string name="surface_connection_title">Bilgisayarlar</string>
     <string name="surface_connection_subtitle">Bilgisayarlarını eşleştir ve bağlan</string>
+    <string name="surface_settings_title">Ayarlar</string>
+    <string name="surface_settings_subtitle">Düzenler, hazır modlar ve seçenekler</string>
 </resources>

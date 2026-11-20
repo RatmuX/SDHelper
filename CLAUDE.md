@@ -30,4 +30,4 @@ Gradle needs a full **JDK** (with `javac`), 17 or newer; the build targets Java 
 `build-logic/` convention plugins and architecture rules; `core/*` pure Kotlin/JVM; `ui/*` design contract and implementations; `feature/*` screens; `data/*` storage; `app/android` composition root; `agent/*` desktop agent (`agent:server` is the Ktor transport). Tests of the phone side run against the real agent.
 
 ## Phases
-The owner approves each phase before the next starts. Done: 0 (requirements), 1 (design docs), 2 (skeleton), 3a (secure connection and pairing), 3b (deck channel, built-in actions, Windows helper, DPAPI, phone actions list). Next: 3c (button grid, state colors and the editor).
+The owner approves each phase before the next starts. Done: 0 (requirements), 1 (design docs), 2 (skeleton), 3a (secure connection and pairing), 3b (deck channel, built-in actions, Windows helper, DPAPI, phone actions list). 3c (landscape button grid, pages, layouts and presets, editor with drag and drop, settings) is built and awaits the owner's phone test. Next: 3d (folders).

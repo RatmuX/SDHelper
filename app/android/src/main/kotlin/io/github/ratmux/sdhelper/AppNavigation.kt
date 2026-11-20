@@ -11,8 +11,10 @@ import io.github.ratmux.sdhelper.core.model.SurfaceIds
 import io.github.ratmux.sdhelper.feature.connection.AddComputerScreen
 import io.github.ratmux.sdhelper.feature.connection.ComputersScreen
 import io.github.ratmux.sdhelper.feature.deck.DeckScreen
+import io.github.ratmux.sdhelper.feature.deckeditor.EditorScreen
 import io.github.ratmux.sdhelper.feature.home.HomeScreen
 import io.github.ratmux.sdhelper.feature.home.defaultSurfaceEntries
+import io.github.ratmux.sdhelper.feature.settings.SettingsScreen
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -23,6 +25,12 @@ data object ComputersRoute : NavKey
 
 @Serializable
 data object DeckRoute : NavKey
+
+@Serializable
+data object EditorRoute : NavKey
+
+@Serializable
+data object SettingsRoute : NavKey
 
 @Serializable
 data class AddComputerRoute(
@@ -52,7 +60,9 @@ fun AppNavigation() {
                         onOpen = { surface ->
                             when (surface.id) {
                                 SurfaceIds.DECK -> backStack.add(DeckRoute)
+                                SurfaceIds.DECK_EDITOR -> backStack.add(EditorRoute)
                                 SurfaceIds.CONNECTION -> backStack.add(ComputersRoute)
+                                SurfaceIds.SETTINGS -> backStack.add(SettingsRoute)
                             }
                         },
                     )
@@ -60,6 +70,8 @@ fun AppNavigation() {
                 entry<DeckRoute> {
                     DeckScreen(onOpenComputers = { backStack.add(ComputersRoute) })
                 }
+                entry<EditorRoute> { EditorScreen() }
+                entry<SettingsRoute> { SettingsScreen(onBack = back) }
                 entry<ComputersRoute> {
                     ComputersScreen(
                         onBack = back,

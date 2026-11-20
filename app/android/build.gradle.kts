@@ -31,6 +31,8 @@ dependencies {
     implementation(project(":feature:home"))
     implementation(project(":feature:connection"))
     implementation(project(":feature:deck"))
+    implementation(project(":feature:deck-editor"))
+    implementation(project(":feature:settings"))
     implementation(project(":data:devices"))
     implementation(project(":data:profiles"))
     implementation(project(":data:settings"))

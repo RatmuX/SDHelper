@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="editor_edit_mode">Düzenleme modu</string>
+    <string name="editor_page_options">Sayfa…</string>
+    <string name="editor_default_page">Sayfa %1$d</string>
+    <string name="editor_hint_locked">Düzeni değiştirmek için düzenleme modunu aç.</string>
+    <string name="editor_hint_editing">Değiştirmek için bir hücreye dokun. Bir tuşa basılı tutup başka bir hücreye sürükle; sayfayı değiştirmek için kenarda beklet.</string>
+    <string name="editor_close">Kapat</string>
+    <string name="editor_cancel">Vazgeç</string>
+    <string name="editor_ok">Tamam</string>
+
+    <string name="editor_cell_title">Tuş</string>
+    <string name="editor_cell_choose">Eylem seç…</string>
+    <string name="editor_cell_clear">Bu tuşu kaldır</string>
+    <string name="editor_cell_move_to_page">Başka sayfaya taşı…</string>
+    <string name="editor_picker_title">Eylem seç</string>
+    <string name="editor_picker_empty">Henüz bilinen eylem yok. Bilgisayarına bir kez bağlan, burada görünürler.</string>
+    <string name="editor_move_title">Sayfaya taşı</string>
+
+    <string name="editor_page_title">Sayfa</string>
+    <string name="editor_page_rename">Sayfayı yeniden adlandır…</string>
+    <string name="editor_page_add">Sayfa ekle</string>
+    <string name="editor_page_delete">Bu sayfayı sil</string>
+    <string name="editor_page_left">Sayfayı sola taşı</string>
+    <string name="editor_page_right">Sayfayı sağa taşı</string>
+    <string name="editor_page_grid">Izgara boyutu…</string>
+    <string name="editor_rename_title">Sayfa adı</string>
+    <string name="editor_delete_title">Sayfa silinsin mi?</string>
+    <string name="editor_delete_message">\"%1$s\" sayfası ve tuşları bu düzenden kaldırılacak.</string>
+    <string name="editor_delete_confirm">Sil</string>
+
+    <string name="editor_grid_title">Izgara boyutu</string>
+    <string name="editor_grid_current">Mevcut</string>
+    <string name="editor_grid_confirm_title">Izgara boyutu değişsin mi?</string>
+    <string name="editor_grid_confirm_message">%1$d tuş yeni ızgaraya sığmıyor; gerekirse diğer ya da yeni sayfalardaki boş hücrelere taşınacak. Hiçbir şey silinmez.</string>
+    <string name="editor_grid_confirm">Değiştir</string>
+
+    <string name="editor_message_grid_does_not_fit">Tuşlar izin verilen sayfa sayısında bu ızgaraya sığmaz.</string>
+    <string name="editor_message_page_full">Bu sayfa dolu.</string>
+    <string name="editor_message_page_limit">Bir düzende en fazla %1$d sayfa olabilir.</string>
+    <string name="editor_not_available">Bu bilgisayarda yok</string>
+</resources>

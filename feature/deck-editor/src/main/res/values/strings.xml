@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="editor_edit_mode">Edit mode</string>
+    <string name="editor_page_options">Page…</string>
+    <string name="editor_default_page">Page %1$d</string>
+    <string name="editor_hint_locked">Turn on edit mode to change the layout.</string>
+    <string name="editor_hint_editing">Tap a cell to change it. Press and hold a button, then drag it to another cell; hold it at the edge to change page.</string>
+    <string name="editor_close">Close</string>
+    <string name="editor_cancel">Cancel</string>
+    <string name="editor_ok">OK</string>
+
+    <string name="editor_cell_title">Button</string>
+    <string name="editor_cell_choose">Choose an action…</string>
+    <string name="editor_cell_clear">Remove this button</string>
+    <string name="editor_cell_move_to_page">Move to another page…</string>
+    <string name="editor_picker_title">Choose an action</string>
+    <string name="editor_picker_empty">No actions are known yet. Connect to your computer once, then they appear here.</string>
+    <string name="editor_move_title">Move to page</string>
+
+    <string name="editor_page_title">Page</string>
+    <string name="editor_page_rename">Rename page…</string>
+    <string name="editor_page_add">Add a page</string>
+    <string name="editor_page_delete">Delete this page</string>
+    <string name="editor_page_left">Move page left</string>
+    <string name="editor_page_right">Move page right</string>
+    <string name="editor_page_grid">Grid size…</string>
+    <string name="editor_rename_title">Page name</string>
+    <string name="editor_delete_title">Delete page?</string>
+    <string name="editor_delete_message">The page \"%1$s\" and its buttons will be removed from this layout.</string>
+    <string name="editor_delete_confirm">Delete</string>
+
+    <string name="editor_grid_title">Grid size</string>
+    <string name="editor_grid_current">Current</string>
+    <string name="editor_grid_confirm_title">Change grid size?</string>
+    <string name="editor_grid_confirm_message">%1$d buttons do not fit in the new grid and will move to free cells, if needed on other or new pages. Nothing is deleted.</string>
+    <string name="editor_grid_confirm">Change</string>
+
+    <string name="editor_message_grid_does_not_fit">The buttons would not fit in that grid on the allowed number of pages.</string>
+    <string name="editor_message_page_full">That page is full.</string>
+    <string name="editor_message_page_limit">A layout can have at most %1$d pages.</string>
+    <string name="editor_not_available">Not on this computer</string>
+</resources>

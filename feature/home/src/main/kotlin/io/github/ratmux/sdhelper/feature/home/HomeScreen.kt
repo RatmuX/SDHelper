@@ -35,6 +35,7 @@ fun defaultSurfaceEntries(): List<SurfaceEntry> =
             R.string.surface_connection_title,
             R.string.surface_connection_subtitle,
         ),
+        SurfaceEntry(Surface(SurfaceIds.SETTINGS), R.string.surface_settings_title, R.string.surface_settings_subtitle),
     )
 
 @Composable

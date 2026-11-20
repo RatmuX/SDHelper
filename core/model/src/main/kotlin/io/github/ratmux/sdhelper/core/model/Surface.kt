@@ -14,4 +14,5 @@ object SurfaceIds {
     const val DECK = "deck"
     const val DECK_EDITOR = "deck-editor"
     const val CONNECTION = "connection"
+    const val SETTINGS = "settings"
 }

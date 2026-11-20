@@ -4,7 +4,9 @@
     <string name="surface_deck_title">Control Panel</string>
     <string name="surface_deck_subtitle">Use your shortcut buttons</string>
     <string name="surface_editor_title">Edit Shortcuts</string>
-    <string name="surface_editor_subtitle">Arrange pages, folders and profiles</string>
+    <string name="surface_editor_subtitle">Arrange buttons and pages with drag and drop</string>
     <string name="surface_connection_title">Computers</string>
     <string name="surface_connection_subtitle">Pair and connect to your computers</string>
+    <string name="surface_settings_title">Settings</string>
+    <string name="surface_settings_subtitle">Layouts, ready-made modes and options</string>
 </resources>
