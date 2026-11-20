@@ -55,7 +55,6 @@ import io.github.ratmux.sdhelper.ui.designapi.DeckListItem
 import io.github.ratmux.sdhelper.ui.designapi.DeckModal
 import io.github.ratmux.sdhelper.ui.designapi.DeckPageIndicator
 import io.github.ratmux.sdhelper.ui.designapi.DeckStatusMessage
-import io.github.ratmux.sdhelper.ui.designapi.DeckSwitchRow
 import io.github.ratmux.sdhelper.ui.designapi.DeckText
 import io.github.ratmux.sdhelper.ui.designapi.DeckTextField
 import io.github.ratmux.sdhelper.ui.designapi.DeckTextStyle
@@ -89,6 +88,8 @@ private sealed interface Dialog {
     ) : Dialog
 
     data object PageOptions : Dialog
+
+    data object Layouts : Dialog
 
     data object RenamePage : Dialog
 
@@ -172,7 +173,7 @@ private fun EditorBody(
         remember(pager) {
             object : GridGestureHandler {
                 override fun onTap(index: Int) {
-                    if (latestState.editMode) dialog = Dialog.Cell(SlotPosition(pager.currentPage, index))
+                    dialog = Dialog.Cell(SlotPosition(pager.currentPage, index))
                 }
 
                 override fun onDragStart(
@@ -209,14 +210,14 @@ private fun EditorBody(
             profile,
             pager,
             onPageOptions = { dialog = Dialog.PageOptions },
-            onEditMode = viewModel::setEditMode,
+            onLayouts = { dialog = Dialog.Layouts },
         )
         Box(
             Modifier
                 .weight(1f)
                 .fillMaxWidth()
                 .onSizeChanged { containerSize = it }
-                .gridGestures(enabled = state.editMode, geometry = { geometry }, handler = handler),
+                .gridGestures(enabled = true, geometry = { geometry }, handler = handler),
         ) {
             HorizontalPager(
                 state = pager,
@@ -249,7 +250,7 @@ private fun EditorBody(
                         }
 
                         null -> {
-                            if (state.editMode) DeckEmptyTile(modifier = cell, highlighted = hovered)
+                            DeckEmptyTile(modifier = cell, highlighted = hovered)
                         }
                     }
                 }
@@ -291,17 +292,17 @@ private fun Header(
     profile: DeckProfile,
     pager: PagerState,
     onPageOptions: () -> Unit,
-    onEditMode: (Boolean) -> Unit,
+    onLayouts: () -> Unit,
 ) {
     Row(
         modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        DeckSwitchRow(
-            label = stringResource(R.string.editor_edit_mode),
-            checked = state.editMode,
-            onCheckedChange = onEditMode,
+        DeckButton(
+            text = profile.name,
+            onClick = onLayouts,
+            emphasis = DeckEmphasis.SECONDARY,
             modifier = Modifier.widthIn(max = 240.dp),
         )
         Column(Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
@@ -336,18 +337,16 @@ private fun Header(
                     style = DeckTextStyle.TITLE,
                 )
                 DeckText(
-                    stringResource(if (state.editMode) R.string.editor_hint_editing else R.string.editor_hint_locked),
+                    stringResource(R.string.editor_hint),
                     style = DeckTextStyle.CAPTION,
                 )
             }
         }
-        if (state.editMode) {
-            DeckButton(
-                text = stringResource(R.string.editor_page_options),
-                onClick = onPageOptions,
-                emphasis = DeckEmphasis.SECONDARY,
-            )
-        }
+        DeckButton(
+            text = stringResource(R.string.editor_page_options),
+            onClick = onPageOptions,
+            emphasis = DeckEmphasis.SECONDARY,
+        )
         if (profile.pages.size > 1) DeckPageIndicator(count = profile.pages.size, current = pager.currentPage)
     }
 }
@@ -447,6 +446,10 @@ private fun Dialogs(
                     }
                 }
             }
+        }
+
+        Dialog.Layouts -> {
+            LayoutsDialogs(onClose = close)
         }
 
         Dialog.PageOptions -> {

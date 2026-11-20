@@ -3,22 +3,4 @@
     <string name="settings_title">Ayarlar</string>
     <string name="settings_haptic">Tuşa basınca titret</string>
     <string name="settings_keep_screen_on">Kontrol panelinde ekranı açık tut</string>
-    <string name="settings_layouts">Düzenler</string>
-    <string name="settings_layout_active">Etkin</string>
-    <string name="settings_layout_summary">%1$d sayfa, %2$d × %3$d</string>
-    <string name="settings_add_preset">Hazır düzen ekle</string>
-    <string name="settings_preset_title">Hazır düzen ekle</string>
-    <string name="settings_layout_title">Düzen</string>
-    <string name="settings_use">Bu düzeni kullan</string>
-    <string name="settings_rename">Yeniden adlandır…</string>
-    <string name="settings_duplicate">Kopyasını oluştur</string>
-    <string name="settings_delete">Sil…</string>
-    <string name="settings_delete_title">Düzen silinsin mi?</string>
-    <string name="settings_delete_message">\"%1$s\" düzeni ve tüm sayfaları kaldırılacak.</string>
-    <string name="settings_delete_confirm">Sil</string>
-    <string name="settings_rename_title">Düzen adı</string>
-    <string name="settings_ok">Tamam</string>
-    <string name="settings_cancel">Vazgeç</string>
-    <string name="settings_close">Kapat</string>
-    <string name="settings_last_layout">En az bir düzen olmalı, bu yüzden son düzen silinemez.</string>
 </resources>

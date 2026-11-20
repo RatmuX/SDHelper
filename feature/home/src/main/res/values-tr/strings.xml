@@ -8,5 +8,5 @@
     <string name="surface_connection_title">Bilgisayarlar</string>
     <string name="surface_connection_subtitle">Bilgisayarlarını eşleştir ve bağlan</string>
     <string name="surface_settings_title">Ayarlar</string>
-    <string name="surface_settings_subtitle">Düzenler, hazır modlar ve seçenekler</string>
+    <string name="surface_settings_subtitle">Titreşim ve ekran seçenekleri</string>
 </resources>

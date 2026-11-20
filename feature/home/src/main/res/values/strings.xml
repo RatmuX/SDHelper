@@ -8,5 +8,5 @@
     <string name="surface_connection_title">Computers</string>
     <string name="surface_connection_subtitle">Pair and connect to your computers</string>
     <string name="surface_settings_title">Settings</string>
-    <string name="surface_settings_subtitle">Layouts, ready-made modes and options</string>
+    <string name="surface_settings_subtitle">Vibration and screen options</string>
 </resources>

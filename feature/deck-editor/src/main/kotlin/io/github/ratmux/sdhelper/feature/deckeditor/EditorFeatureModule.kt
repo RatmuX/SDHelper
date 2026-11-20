@@ -17,4 +17,16 @@ val deckEditorFeatureModule =
                 defaultPageName = { number -> context.getString(R.string.editor_default_page, number) },
             )
         }
+        viewModel {
+            val context = androidContext()
+            LayoutsViewModel(
+                profiles = get(),
+                language = {
+                    context.resources.configuration.locales[0]
+                        .language
+                },
+                defaultPageName = { number -> context.getString(R.string.editor_default_page, number) },
+                newLayoutName = { context.getString(R.string.layouts_default_name) },
+            )
+        }
     }

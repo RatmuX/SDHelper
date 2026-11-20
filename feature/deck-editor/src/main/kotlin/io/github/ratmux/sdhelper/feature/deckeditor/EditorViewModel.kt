@@ -49,7 +49,6 @@ data class EditorUiState(
     val buttons: Map<String, ButtonModel> = emptyMap(),
     /** Every action the phone knows (remembered and live), for the action picker. */
     val actions: List<DeckAction> = emptyList(),
-    val editMode: Boolean = false,
     val pendingResize: PendingResize? = null,
     val message: EditorMessage? = null,
     val connected: Boolean = false,
@@ -63,9 +62,8 @@ private class Live(
 )
 
 /**
- * The editor of the active layout. **Every change is ignored unless edit mode is on**, so opening the editor and
- * touching things can never alter a layout by accident. Changes are applied one at a time, always on top of the
- * latest saved layout, and saved immediately.
+ * The editor of the active layout. The editor is its own screen, reached on purpose from the home menu, so there is
+ * no extra lock. Changes are applied one at a time, always on top of the latest saved layout, and saved immediately.
  */
 class EditorViewModel(
     private val profiles: ProfileStore,
@@ -74,7 +72,6 @@ class EditorViewModel(
     status: ConnectionStatus,
     private val defaultPageName: (Int) -> String = { "Page $it" },
 ) : ViewModel() {
-    private val editMode = MutableStateFlow(false)
     private val pending = MutableStateFlow<PendingResize?>(null)
     private val message = MutableStateFlow<EditorMessage?>(null)
     private val mutex = Mutex()
@@ -94,10 +91,10 @@ class EditorViewModel(
             )
         }
 
-    private val flags = combine(editMode, pending, message) { edit, resize, notice -> Triple(edit, resize, notice) }
+    private val flags = combine(pending, message) { resize, notice -> resize to notice }
 
     val state: StateFlow<EditorUiState> =
-        combine(layout, live, flags) { profile, liveData, (edit, resize, notice) ->
+        combine(layout, live, flags) { profile, liveData, (resize, notice) ->
             EditorUiState(
                 profile = profile,
                 buttons =
@@ -116,17 +113,11 @@ class EditorViewModel(
                                 )
                         }.orEmpty(),
                 actions = liveData.known.values.sortedBy { it.title.lowercase() },
-                editMode = edit,
                 pendingResize = resize,
                 message = notice,
                 connected = liveData.connected,
             )
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MILLIS), EditorUiState())
-
-    fun setEditMode(on: Boolean) {
-        editMode.value = on
-        if (!on) pending.value = null
-    }
 
     fun assign(
         at: SlotPosition,
@@ -185,7 +176,6 @@ class EditorViewModel(
      * to move buttons waits in [EditorUiState.pendingResize] for [confirmResize].
      */
     fun requestGrid(grid: GridSize) {
-        if (!editMode.value) return
         viewModelScope.launch {
             mutex.withLock {
                 val profile = currentProfile() ?: return@withLock
@@ -218,7 +208,6 @@ class EditorViewModel(
     }
 
     private fun edit(change: (DeckProfile) -> DeckProfile?) {
-        if (!editMode.value) return
         viewModelScope.launch {
             mutex.withLock {
                 val profile = currentProfile() ?: return@withLock

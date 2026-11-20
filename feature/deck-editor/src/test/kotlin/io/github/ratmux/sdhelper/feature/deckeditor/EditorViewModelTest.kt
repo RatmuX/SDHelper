@@ -103,29 +103,9 @@ class EditorViewModelTest {
         }
 
     @Test
-    fun `nothing can be changed while edit mode is off`() =
-        runTest {
-            collected {
-                vm.assign(SlotPosition(0, 7), BuiltinActions.NEXT)
-                vm.clear(SlotPosition(0, 0))
-                vm.move(SlotPosition(0, 0), SlotPosition(0, 5))
-                vm.addPage()
-                vm.removePage(0)
-                vm.renamePage(0, "Hacked")
-                vm.reorderPage(0, 1)
-                vm.requestGrid(GridSize(6, 3))
-                vm.confirmResize()
-
-                assertEquals(start, saved)
-                assertEquals(0, profiles.saves, "not even a save happened")
-            }
-        }
-
-    @Test
-    fun `with edit mode on, changes are applied and saved at once`() =
+    fun `changes are applied and saved at once`() =
         runTest {
             collected { state ->
-                vm.setEditMode(true)
                 vm.assign(SlotPosition(0, 7), BuiltinActions.MUTE_MICROPHONE)
                 assertEquals(DeckSlot.Action(BuiltinActions.MUTE_MICROPHONE), saved.slotAt(SlotPosition(0, 7)))
 
@@ -134,18 +114,6 @@ class EditorViewModelTest {
 
                 vm.move(SlotPosition(0, 1), SlotPosition(1, 6))
                 assertEquals(start.slotAt(SlotPosition(0, 1)), saved.slotAt(SlotPosition(1, 6)))
-                assertTrue(state.first { it.editMode }.editMode)
-            }
-        }
-
-    @Test
-    fun `turning edit mode off locks the editor again`() =
-        runTest {
-            collected {
-                vm.setEditMode(true)
-                vm.setEditMode(false)
-                vm.clear(SlotPosition(0, 1))
-                assertEquals(start, saved)
             }
         }
 
@@ -153,7 +121,6 @@ class EditorViewModelTest {
     fun `a button can be sent to another page without dragging`() =
         runTest {
             collected {
-                vm.setEditMode(true)
                 vm.moveToPage(SlotPosition(0, 0), page = 1)
 
                 assertNull(saved.slotAt(SlotPosition(0, 0)))
@@ -167,7 +134,6 @@ class EditorViewModelTest {
     fun `sending a button to a full page is refused with a message`() =
         runTest {
             collected { state ->
-                vm.setEditMode(true)
                 repeat(8) { vm.assign(SlotPosition(1, it), BuiltinActions.NEXT) }
 
                 vm.moveToPage(SlotPosition(0, 0), page = 1)
@@ -183,7 +149,6 @@ class EditorViewModelTest {
     fun `pages can be added up to the limit, renamed, reordered and removed`() =
         runTest {
             collected { state ->
-                vm.setEditMode(true)
                 vm.addPage()
                 assertEquals(3, saved.pages.size)
                 assertEquals("Page 3", saved.pages[2].name)
@@ -205,7 +170,6 @@ class EditorViewModelTest {
     fun `a grid change that keeps every button in place is applied directly`() =
         runTest {
             collected { state ->
-                vm.setEditMode(true)
                 vm.requestGrid(GridSize(6, 3))
 
                 assertEquals(GridSize(6, 3), saved.grid)
@@ -218,7 +182,6 @@ class EditorViewModelTest {
     fun `a grid change that moves buttons waits for confirmation and can be cancelled`() =
         runTest {
             collected { state ->
-                vm.setEditMode(true)
                 vm.assign(SlotPosition(0, 3), BuiltinActions.NEXT) // column 3 disappears in a 3-column grid
 
                 vm.requestGrid(GridSize(3, 2))
@@ -239,23 +202,6 @@ class EditorViewModelTest {
         }
 
     @Test
-    fun `leaving edit mode drops a pending grid change`() =
-        runTest {
-            collected { state ->
-                vm.setEditMode(true)
-                vm.assign(SlotPosition(0, 3), BuiltinActions.NEXT)
-                vm.requestGrid(GridSize(3, 2))
-                state.first { it.pendingResize != null }
-
-                vm.setEditMode(false)
-
-                assertNull(state.first { it.pendingResize == null }.pendingResize)
-                vm.confirmResize()
-                assertEquals(GridSize(4, 2), saved.grid)
-            }
-        }
-
-    @Test
     fun `a grid change that cannot fit is refused and changes nothing`() =
         runTest {
             val full =
@@ -271,7 +217,6 @@ class EditorViewModelTest {
             val bigVm = EditorViewModel(bigProfiles, FakeCache(emptyList()), FakeDeck(), FakeStatus())
             coroutineScope {
                 val job = launch { bigVm.state.collect {} }
-                bigVm.setEditMode(true)
 
                 bigVm.requestGrid(GridSize(3, 2))
 
