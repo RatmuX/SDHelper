@@ -6,6 +6,7 @@ import io.github.ratmux.sdhelper.data.connection.APP_SCOPE
 import io.github.ratmux.sdhelper.data.connection.connectionModule
 import io.github.ratmux.sdhelper.data.devices.DataStorePairedComputerStore
 import io.github.ratmux.sdhelper.feature.connection.connectionFeatureModule
+import io.github.ratmux.sdhelper.feature.deck.deckFeatureModule
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -21,4 +22,4 @@ val appModule =
     }
 
 /** Every Koin module of the app, in one place so tests can check the whole graph. */
-val allModules = listOf(appModule, connectionModule, connectionFeatureModule)
+val allModules = listOf(appModule, connectionModule, connectionFeatureModule, deckFeatureModule)

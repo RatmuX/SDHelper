@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="actions_title">Control Panel</string>
+    <string name="actions_not_connected">Not connected to a computer.</string>
+    <string name="actions_open_computers">Open computers</string>
+    <string name="actions_connecting">Connecting…</string>
+    <string name="actions_signing_in">Signing in…</string>
+    <string name="actions_empty">This computer offers no actions.</string>
+    <string name="actions_unavailable">Not available right now</string>
+    <string name="actions_on">On</string>
+    <string name="actions_off">Off</string>
+    <string name="actions_error_not_connected">The connection was lost. Try again in a moment.</string>
+    <string name="actions_error_refused">The computer could not do that: %1$s</string>
+</resources>

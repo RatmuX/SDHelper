@@ -32,6 +32,7 @@ import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -161,11 +162,17 @@ object M3DesignSystem : DesignSystem {
         title: String,
         supporting: String?,
         trailing: String?,
+        enabled: Boolean,
         onClick: () -> Unit,
         modifier: Modifier,
     ) {
         ListItem(
-            modifier = modifier.clickable(onClick = onClick),
+            // A disabled row is dimmed and ignores taps; the system announces it as disabled.
+            modifier =
+                modifier
+                    .alpha(
+                        if (enabled) 1f else DISABLED_ALPHA,
+                    ).clickable(enabled = enabled, onClick = onClick),
             supportingContent = supporting?.let { { Text(it) } },
             trailingContent = trailing?.let { { Text(it) } },
         ) {
@@ -223,6 +230,8 @@ object M3DesignSystem : DesignSystem {
             }
         Text(text = text, style = textStyle, modifier = modifier)
     }
+
+    private const val DISABLED_ALPHA = 0.38f
 
     /** Container and content color of a tone, always taken as a matching pair from the scheme. */
     private fun toneColors(

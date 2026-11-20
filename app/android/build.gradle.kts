@@ -30,6 +30,7 @@ dependencies {
     implementation(project(":ui:design-api"))
     implementation(project(":feature:home"))
     implementation(project(":feature:connection"))
+    implementation(project(":feature:deck"))
     implementation(project(":data:devices"))
     implementation(project(":data:connection"))
 

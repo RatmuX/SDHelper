@@ -11,6 +11,8 @@ dependencies {
 
     // The phone side is tested against the real agent over TLS (see ConnectionIntegrationTest).
     testImplementation(project(":agent:server"))
+    testImplementation(project(":plugins:builtin-system-audio"))
+    testImplementation(project(":plugins:builtin-media"))
     testImplementation(libs.kotlin.test.junit)
     testImplementation(libs.kotlinx.coroutines.test)
     testRuntimeOnly(libs.slf4j.simple)

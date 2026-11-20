@@ -17,13 +17,17 @@ import io.github.ratmux.sdhelper.core.protocol.tls.PinnedTrustManager
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.serialization.Serializable
+import java.io.IOException
 import java.util.Base64
 import kotlin.random.Random
 
@@ -57,9 +61,30 @@ class DefaultConnectionManager(
     private val backoff: Backoff = Backoff(),
     private val pingIntervalMillis: Long = PING_INTERVAL_MILLIS,
     private val silenceTimeoutMillis: Long = SILENCE_TIMEOUT_MILLIS,
-) : ConnectionStatus {
+) : ConnectionStatus,
+    DeckTransport {
     private val mutableState = MutableStateFlow<ConnectionState>(ConnectionState.Disconnected)
     override val state: StateFlow<ConnectionState> get() = mutableState
+
+    private val mutableIncoming =
+        MutableSharedFlow<Envelope>(
+            extraBufferCapacity = INCOMING_BUFFER,
+            onBufferOverflow = BufferOverflow.DROP_OLDEST,
+        )
+    override val incoming: SharedFlow<Envelope> get() = mutableIncoming
+
+    @Volatile
+    private var activeSocket: ProtocolSocket? = null
+
+    override fun send(envelope: Envelope): Boolean {
+        val socket = activeSocket ?: return false
+        return try {
+            socket.send(envelope)
+            true
+        } catch (_: IOException) {
+            false
+        }
+    }
 
     private var job: Job? = null
 
@@ -122,6 +147,7 @@ class DefaultConnectionManager(
             if (answer.type != ControlTypes.AUTH_OK) return authFailure(answer)
 
             connected = true
+            activeSocket = socket // before announcing the state, so listeners can send as soon as they see it
             mutableState.value = ConnectionState.Connected(computer.name)
             heartbeat(socket)
             return SessionResult.Retry(true)
@@ -137,6 +163,7 @@ class DefaultConnectionManager(
                 SessionResult.Retry(connected)
             }
         } finally {
+            activeSocket = null
             socket?.close()
         }
     }
@@ -178,7 +205,8 @@ class DefaultConnectionManager(
             try {
                 while (true) {
                     // Any message counts as a sign of life; a closed connection throws and ends the session.
-                    if (withTimeoutOrNull(silenceTimeoutMillis) { socket.receive() } == null) break
+                    val message = withTimeoutOrNull(silenceTimeoutMillis) { socket.receive() } ?: break
+                    mutableIncoming.tryEmit(message)
                 }
             } finally {
                 pinger.cancel()
@@ -192,5 +220,6 @@ class DefaultConnectionManager(
         const val PING_INTERVAL_MILLIS = 5_000L
         const val SILENCE_TIMEOUT_MILLIS = 15_000L
         private const val AUTH_TIMEOUT_MILLIS = 10_000L
+        private const val INCOMING_BUFFER = 64
     }
 }

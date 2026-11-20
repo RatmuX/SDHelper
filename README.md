@@ -24,6 +24,7 @@ Requires a JDK 17+ with `javac` (on Fedora: `java-25-openjdk-devel`), the Androi
 1. On the computer: `./gradlew :agent:desktop-app:run` (add `--args="--headless"` for a terminal-only mode). A QR code and PIN appear; they exist only while the window (or terminal) shows them.
 2. On the phone: install the debug APK (`adb install app/android/build/outputs/apk/m3/debug/android-m3-debug.apk`), open SDHelper → Computers → Add computer → Scan QR code. Alternatively enter the computer's address and the PIN, then confirm on the computer after comparing the two codes.
 3. Phone and computer must be on the same network and the computer's firewall must allow TCP port 47821.
+4. Once connected, open **Control Panel**: volume, speakers, microphone and media actions appear and follow changes made on the computer. Without Windows, start the agent with `--args="--demo-platform"` (simulated volume, microphone and a three-track player).
 
 ### Trying the agent on Windows
 Pushes to `main` build a Windows test bundle: GitHub → Actions → the latest run → *Artifacts* → `sdhelper-agent-windows` (kept 14 days, not a release). Unzip it, run `SDHelperAgent.exe` (keep `sdhelper-native.exe` next to it) and pair as above. `SDHelperAgent.exe --demo-platform` simulates volume and media.

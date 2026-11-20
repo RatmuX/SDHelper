@@ -10,6 +10,7 @@ import androidx.navigation3.ui.NavDisplay
 import io.github.ratmux.sdhelper.core.model.SurfaceIds
 import io.github.ratmux.sdhelper.feature.connection.AddComputerScreen
 import io.github.ratmux.sdhelper.feature.connection.ComputersScreen
+import io.github.ratmux.sdhelper.feature.deck.ActionsScreen
 import io.github.ratmux.sdhelper.feature.home.HomeScreen
 import io.github.ratmux.sdhelper.feature.home.defaultSurfaceEntries
 import kotlinx.serialization.Serializable
@@ -19,6 +20,9 @@ data object HomeRoute : NavKey
 
 @Serializable
 data object ComputersRoute : NavKey
+
+@Serializable
+data object ActionsRoute : NavKey
 
 @Serializable
 data class AddComputerRoute(
@@ -46,13 +50,17 @@ fun AppNavigation() {
                     HomeScreen(
                         entries = defaultSurfaceEntries(),
                         onOpen = { surface ->
-                            // The control panel and the editor arrive in Phase 3c; until then both lead to the
-                            // computers screen, which shows the connection state.
+                            // The button grid and the editor arrive in Phase 3c; until then the control panel
+                            // is a plain list of actions.
                             when (surface.id) {
-                                SurfaceIds.DECK, SurfaceIds.CONNECTION -> backStack.add(ComputersRoute)
+                                SurfaceIds.DECK -> backStack.add(ActionsRoute)
+                                SurfaceIds.CONNECTION -> backStack.add(ComputersRoute)
                             }
                         },
                     )
+                }
+                entry<ActionsRoute> {
+                    ActionsScreen(onBack = back, onOpenComputers = { backStack.add(ComputersRoute) })
                 }
                 entry<ComputersRoute> {
                     ComputersScreen(

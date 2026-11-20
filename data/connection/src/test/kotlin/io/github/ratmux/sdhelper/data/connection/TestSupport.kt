@@ -4,11 +4,15 @@ import io.github.ratmux.sdhelper.agent.core.AgentIdentity
 import io.github.ratmux.sdhelper.agent.core.ChallengeAuthenticator
 import io.github.ratmux.sdhelper.agent.core.ChannelRegistry
 import io.github.ratmux.sdhelper.agent.core.ControlSession
+import io.github.ratmux.sdhelper.agent.core.DeckChannelHandler
 import io.github.ratmux.sdhelper.agent.core.FileDeviceRegistry
 import io.github.ratmux.sdhelper.agent.core.FileSecretStore
 import io.github.ratmux.sdhelper.agent.core.PairingApproval
 import io.github.ratmux.sdhelper.agent.core.PairingApprovalRequest
 import io.github.ratmux.sdhelper.agent.core.PairingService
+import io.github.ratmux.sdhelper.agent.core.ProviderRegistry
+import io.github.ratmux.sdhelper.agent.core.platform.InMemoryAudioController
+import io.github.ratmux.sdhelper.agent.core.platform.InMemoryMediaController
 import io.github.ratmux.sdhelper.agent.server.AgentServer
 import io.github.ratmux.sdhelper.agent.server.TlsIdentity
 import io.github.ratmux.sdhelper.core.model.ComputerDiscovery
@@ -16,6 +20,12 @@ import io.github.ratmux.sdhelper.core.model.DiscoveredComputer
 import io.github.ratmux.sdhelper.core.model.LocalNetworkAccess
 import io.github.ratmux.sdhelper.core.model.PairedComputer
 import io.github.ratmux.sdhelper.core.model.PairedComputerStore
+import io.github.ratmux.sdhelper.plugins.builtinmedia.MediaProvider
+import io.github.ratmux.sdhelper.plugins.builtinsystemaudio.SystemAudioProvider
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -49,10 +59,21 @@ class AgentFixture(
             },
         )
     private val authenticator = ChallengeAuthenticator(registry, tls.fingerprint)
+
+    /** The simulated computer: volume, microphone and media, served on the deck channel. */
+    val audio = InMemoryAudioController(initialVolume = 50)
+    val media = InMemoryMediaController()
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+    private val channels =
+        ChannelRegistry().also {
+            it.register(
+                DeckChannelHandler(ProviderRegistry(listOf(SystemAudioProvider(audio), MediaProvider(media))), scope),
+            )
+        }
     private val server =
         AgentServer(
             tls,
-            { sink -> ControlSession(identity, pairing, authenticator, ChannelRegistry(), sink = sink) },
+            { sink -> ControlSession(identity, pairing, authenticator, channels, sink = sink) },
             port = port,
             bindHost = "127.0.0.1",
         )
@@ -60,7 +81,10 @@ class AgentFixture(
 
     fun newOffer() = pairing.newOffer()
 
-    fun stop() = server.stop()
+    fun stop() {
+        server.stop()
+        scope.cancel()
+    }
 }
 
 /** Plays the Android Keystore: EC P-256 keys in memory. */

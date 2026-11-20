@@ -116,6 +116,8 @@ data:devices        DataStore implementation of PairedComputerStore
 data:connection     DefaultPairingClient, DefaultConnectionManager, ConnectionSupervisor,
                     NsdComputerDiscovery, AndroidKeystoreDeviceKeyStore (OkHttp WebSocket, pinned TLS)
 app:android         Koin modules, Navigation 3 routes, the Android implementation of LocalNetworkAccess
+feature:deck        actions list of the connected computer (temporary control panel); DefaultDeckActions in
+                    data:connection implements the DeckActions port from core:model
 ```
 Interfaces live in `core:model` so features never depend on data modules' internals. Decisions and open points: ADR-0010.
 

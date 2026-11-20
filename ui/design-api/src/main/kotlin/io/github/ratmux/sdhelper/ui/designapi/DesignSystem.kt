@@ -67,6 +67,7 @@ interface DesignSystem {
         title: String,
         supporting: String?,
         trailing: String?,
+        enabled: Boolean,
         onClick: () -> Unit,
         modifier: Modifier,
     )
@@ -158,7 +159,8 @@ fun DeckListItem(
     modifier: Modifier = Modifier,
     supporting: String? = null,
     trailing: String? = null,
-) = LocalDesignSystem.current.ListItem(title, supporting, trailing, onClick, modifier)
+    enabled: Boolean = true,
+) = LocalDesignSystem.current.ListItem(title, supporting, trailing, enabled, onClick, modifier)
 
 @Composable
 fun DeckDialog(
