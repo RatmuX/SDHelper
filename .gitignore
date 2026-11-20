@@ -1,0 +1,27 @@
+# Build outputs
+build/
+.gradle/
+*.apk
+*.aab
+*.msi
+target/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# Secrets and local config (never commit)
+local.properties
+*.jks
+*.keystore
+*.pem
+*.key
+.env
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Working notes
+claude-code-prompt.md

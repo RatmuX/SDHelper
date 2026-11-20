@@ -1,0 +1,13 @@
+# Architecture Decision Records
+
+Format: Context, Decision, Alternatives, Consequences. Status: Accepted unless noted.
+
+| ADR | Title |
+|---|---|
+| [0001](ADR-0001-agent-technology.md) | Agent technology: Kotlin agent plus Rust helper |
+| [0002](ADR-0002-kmp-sharing.md) | Share protocol and models with Kotlin Multiplatform |
+| [0003](ADR-0003-design-flavors.md) | Design languages as build flavors |
+| [0004](ADR-0004-android-stack.md) | Android stack: Compose, Navigation 3, Koin, Room |
+| [0005](ADR-0005-transport-security.md) | Transport: TLS WebSocket with pinned certificate |
+| [0006](ADR-0006-plugin-model.md) | Plugins: out-of-process, JSON-RPC over stdio |
+| [0007](ADR-0007-license-scope.md) | Apache-2.0, Windows plus Android first |
