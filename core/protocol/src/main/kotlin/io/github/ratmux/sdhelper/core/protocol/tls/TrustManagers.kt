@@ -70,12 +70,14 @@ abstract class FingerprintTrustManager : X509ExtendedTrustManager() {
 class PinnedTrustManager(
     expectedFingerprint: String,
 ) : FingerprintTrustManager() {
-    private val expected: ByteArray =
-        (Fingerprint.normalize(expectedFingerprint) ?: throw IllegalArgumentException("Invalid fingerprint"))
-            .toByteArray(Charsets.UTF_8)
+    /** The pinned fingerprint in canonical form (64 lowercase hex characters). */
+    val expectedFingerprint: String =
+        Fingerprint.normalize(expectedFingerprint) ?: throw IllegalArgumentException("Invalid fingerprint")
+
+    private val expectedBytes = this.expectedFingerprint.toByteArray(Charsets.UTF_8)
 
     override fun checkLeaf(fingerprint: String) {
-        if (!MessageDigest.isEqual(expected, fingerprint.toByteArray(Charsets.UTF_8))) {
+        if (!MessageDigest.isEqual(expectedBytes, fingerprint.toByteArray(Charsets.UTF_8))) {
             throw CertificateException("Certificate fingerprint does not match the paired computer")
         }
     }

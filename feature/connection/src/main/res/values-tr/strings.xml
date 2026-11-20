@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="computers_title">Bilgisayarlar</string>
+    <string name="computers_paired">Eşleşmiş bilgisayarlar</string>
+    <string name="computers_found">Bu ağda bulunanlar</string>
+    <string name="computers_none">Henüz eşleşmiş bir bilgisayar yok.</string>
+    <string name="computers_add">Bilgisayar ekle</string>
+    <string name="computers_remove">Seçili bilgisayarı kaldır</string>
+    <string name="computers_active">Kullanımda</string>
+    <string name="computers_remove_title">Bilgisayar kaldırılsın mı?</string>
+    <string name="computers_remove_message">%1$s bu telefondan kaldırılsın mı? Bu telefonu bilgisayardaki SDHelper agent\'ında da kaldırabilirsin.</string>
+    <string name="computers_remove_confirm">Kaldır</string>
+    <string name="common_cancel">Vazgeç</string>
+
+    <string name="permission_message">SDHelper\'ın bilgisayarını bulup kontrol edebilmesi için yerel ağındaki cihazlara erişmesi gerekiyor.</string>
+    <string name="permission_allow">Yerel ağ erişimine izin ver</string>
+
+    <string name="state_disconnected">Bağlı değil</string>
+    <string name="state_connecting">Bağlanılıyor…</string>
+    <string name="state_connecting_retry">Bilgisayara ulaşılamıyor, yeniden deneniyor (deneme %1$d)…</string>
+    <string name="state_authenticating">Giriş yapılıyor…</string>
+    <string name="state_connected">%1$s bilgisayarına bağlı</string>
+    <string name="state_failed_certificate">Bilgisayar, eşleştiğin sertifikadan farklı bir sertifika sundu. Güvenliğin için bağlantı reddedildi. Ağa güveniyorsan bilgisayarı kaldırıp yeniden eşleştir.</string>
+    <string name="state_failed_revoked">Bu telefon bilgisayarda kaldırılmış. Burada da kaldırıp yeniden eşleştir.</string>
+    <string name="state_failed_protocol">Bilgisayar, bu uygulamanın anlamadığı bir yanıt verdi. İki cihazda da SDHelper\'ı güncelle.</string>
+
+    <string name="add_title">Bilgisayar ekle</string>
+    <string name="add_scan">QR kodu tara</string>
+    <string name="add_scan_prompt">Bilgisayarındaki SDHelper agent\'ın gösterdiği kodu tara</string>
+    <string name="add_manual">Ya da bilgisayarda görünen bilgileri gir</string>
+    <string name="add_host">Bilgisayar adresi</string>
+    <string name="add_port">Port</string>
+    <string name="add_pin">PIN</string>
+    <string name="add_pair">PIN ile eşleştir</string>
+    <string name="add_working">Bilgisayara bağlanılıyor…</string>
+    <string name="add_waiting">Bilgisayarında onayla. Orada görünen kod %1$s olmalı. Yalnızca iki kod da aynıysa onayla.</string>
+    <string name="add_done">Eşleşti. Artık geri dönebilirsin.</string>
+    <string name="add_failed_unreachable">Bilgisayara ulaşılamadı. Aynı ağda olduğundan ve agent\'ın çalıştığından emin ol.</string>
+    <string name="add_failed_certificate">Bilgisayar, QR koddakinden farklı bir sertifika sundu. Eşleştirme iptal edildi.</string>
+    <string name="add_failed_rejected">Kod kabul edilmedi. Süresi dolmuş olabilir; bilgisayarda yeni bir kod göster ve tekrar dene.</string>
+    <string name="add_failed_denied">Eşleştirme bilgisayarda reddedildi.</string>
+    <string name="add_failed_locked">Çok fazla hatalı deneme. Bilgisayarda yeni bir kod göster.</string>
+    <string name="add_failed_protocol">Bilgisayar, bu uygulamanın anlamadığı bir yanıt verdi.</string>
+    <string name="add_invalid_code">Bu bir SDHelper eşleştirme kodu değil.</string>
+</resources>

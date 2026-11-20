@@ -5,4 +5,6 @@
     <string name="surface_deck_subtitle">Kısayol tuşlarını kullan</string>
     <string name="surface_editor_title">Kısayolları Düzenle</string>
     <string name="surface_editor_subtitle">Sayfaları, klasörleri ve profilleri düzenle</string>
+    <string name="surface_connection_title">Bilgisayarlar</string>
+    <string name="surface_connection_subtitle">Bilgisayarlarını eşleştir ve bağlan</string>
 </resources>

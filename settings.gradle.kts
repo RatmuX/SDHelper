@@ -31,6 +31,7 @@ include(
     ":feature:settings",
     ":data:profiles",
     ":data:devices",
+    ":data:connection",
     ":app:android",
     ":agent:core",
     ":agent:server",

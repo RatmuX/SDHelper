@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="computers_title">Computers</string>
+    <string name="computers_paired">Paired computers</string>
+    <string name="computers_found">Found on this network</string>
+    <string name="computers_none">No computer is paired yet.</string>
+    <string name="computers_add">Add computer</string>
+    <string name="computers_remove">Remove selected computer</string>
+    <string name="computers_active">In use</string>
+    <string name="computers_remove_title">Remove computer?</string>
+    <string name="computers_remove_message">Remove %1$s from this phone? You can also remove this phone in the SDHelper agent on the computer.</string>
+    <string name="computers_remove_confirm">Remove</string>
+    <string name="common_cancel">Cancel</string>
+
+    <string name="permission_message">SDHelper needs access to devices on your local network to find and control your computer.</string>
+    <string name="permission_allow">Allow local network access</string>
+
+    <string name="state_disconnected">Not connected</string>
+    <string name="state_connecting">Connecting…</string>
+    <string name="state_connecting_retry">Computer not reachable, trying again (attempt %1$d)…</string>
+    <string name="state_authenticating">Signing in…</string>
+    <string name="state_connected">Connected to %1$s</string>
+    <string name="state_failed_certificate">The computer presented a different certificate than the one you paired with. The connection was refused for your safety. Remove the computer and pair it again if you trust the network.</string>
+    <string name="state_failed_revoked">This phone was removed on the computer. Remove it here and pair again.</string>
+    <string name="state_failed_protocol">The computer answered in a way this app does not understand. Update SDHelper on both devices.</string>
+
+    <string name="add_title">Add computer</string>
+    <string name="add_scan">Scan QR code</string>
+    <string name="add_scan_prompt">Scan the code shown by the SDHelper agent on your computer</string>
+    <string name="add_manual">Or enter the details shown on your computer</string>
+    <string name="add_host">Computer address</string>
+    <string name="add_port">Port</string>
+    <string name="add_pin">PIN</string>
+    <string name="add_pair">Pair with PIN</string>
+    <string name="add_working">Connecting to the computer…</string>
+    <string name="add_waiting">Confirm on your computer. The code shown there must read %1$s. Only confirm if both codes are identical.</string>
+    <string name="add_done">Paired. You can go back now.</string>
+    <string name="add_failed_unreachable">Could not reach the computer. Check that it is on the same network and that the agent is running.</string>
+    <string name="add_failed_certificate">The computer presented a different certificate than the QR code. Pairing was cancelled.</string>
+    <string name="add_failed_rejected">The code was not accepted. It may have expired; show a new code on the computer and try again.</string>
+    <string name="add_failed_denied">Pairing was declined on the computer.</string>
+    <string name="add_failed_locked">Too many wrong attempts. Show a new code on the computer.</string>
+    <string name="add_failed_protocol">The computer answered in a way this app does not understand.</string>
+    <string name="add_invalid_code">That is not an SDHelper pairing code.</string>
+</resources>

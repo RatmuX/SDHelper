@@ -22,11 +22,11 @@ Gradle needs a full **JDK** (with `javac`), 17 or newer; the build targets Java 
 - Architecture rules only: `./gradlew verifyDependencies`
 - Build-logic tests: `./gradlew -p build-logic test`
 - Android debug APK (Material 3 flavor): `./gradlew :app:android:assembleM3Debug`
-- Run the agent skeleton: `./gradlew :agent:desktop-app:run`
+- Run the agent: `./gradlew :agent:desktop-app:run` (window), add `--args="--headless"` for the terminal mode that prints the pairing QR code; `--port N` changes the port. State lives in `~/.config/sdhelper` (Linux) or `%APPDATA%\SDHelper`; set `SDHELPER_CONFIG_DIR` to use another folder.
 - `local.properties` needs `sdk.dir=<Android SDK path>`; the build needs platform `android-37.1` (AGP downloads it if licenses are accepted).
 
 ## Layout
-`build-logic/` convention plugins and architecture rules; `core/*` pure Kotlin/JVM; `ui/*` design contract and implementations; `feature/*` screens; `data/*` storage; `app/android` composition root; `agent/*` desktop agent.
+`build-logic/` convention plugins and architecture rules; `core/*` pure Kotlin/JVM; `ui/*` design contract and implementations; `feature/*` screens; `data/*` storage; `app/android` composition root; `agent/*` desktop agent (`agent:server` is the Ktor transport). Tests of the phone side run against the real agent.
 
 ## Phases
-The owner approves each phase before the next starts. Done: 0 (requirements), 1 (design docs), 2 (skeleton). Next: 3 (vertical slice).
+The owner approves each phase before the next starts. Done: 0 (requirements), 1 (design docs), 2 (skeleton), 3a (secure connection and pairing). Next: 3b (Windows helper and first actions), 3c (deck grid and editor).

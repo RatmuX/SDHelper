@@ -43,7 +43,8 @@ Built-in actions are implemented as built-in plugins behind the same interface t
 - LAN only. Discovery with mDNS (Android NSD) plus manual IP entry.
 - Pairing with QR code (primary) and PIN (fallback).
 - No command is accepted from an unpaired device. Per-device keys, revocation on the agent. Details in `SECURITY.md`.
-- Reconnect with backoff, multiple computer profiles, defined behavior when the app is backgrounded.
+- Reconnect with backoff, multiple computer profiles. The app connects only while it is in the foreground.
+- Android 17+ requires the `ACCESS_LOCAL_NETWORK` runtime permission for any local network access; the app requests it where needed (ADR-0010).
 
 ### 2.5 Design languages
 - Default: Material Design 3. Second: Miuix, as an extra build flavor.

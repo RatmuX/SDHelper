@@ -97,6 +97,20 @@ Built-in actions run behind the same `ActionProvider` interface as external plug
 - Storage: Room for profiles, DataStore for settings, Android Keystore for the device key.
 - Discovery: Android NSD (platform API, F-Droid friendly). QR scanning with a library that has no proprietary dependency (ZXing based; to be verified in Phase 2).
 
+## 7a. Phone-side connection (Phase 3a)
+
+```
+feature:connection  (screens + view models; sees only core:* and ui:design-api)
+      │ uses interfaces from core:model: PairedComputerStore, PairingClient, ConnectionStatus,
+      │ ComputerDiscovery, LocalNetworkAccess
+      ▼
+data:devices        DataStore implementation of PairedComputerStore
+data:connection     DefaultPairingClient, DefaultConnectionManager, ConnectionSupervisor,
+                    NsdComputerDiscovery, AndroidKeystoreDeviceKeyStore (OkHttp WebSocket, pinned TLS)
+app:android         Koin modules, Navigation 3 routes, the Android implementation of LocalNetworkAccess
+```
+Interfaces live in `core:model` so features never depend on data modules' internals. Decisions and open points: ADR-0010.
+
 ## 8. Architecture enforcement
 
 Implemented in `build-logic` (`sdhelper.root` plugin, rules in `architecture/ArchitectureRules.kt`, unit-tested):

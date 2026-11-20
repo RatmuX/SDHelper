@@ -36,6 +36,12 @@ See `PROTOCOL.md` section 3 for messages. Summary:
 - Limits: 64 KiB frames, at most 16 simultaneous connections, bounded idle and anonymous lifetime, per-connection rate limit.
 - mDNS announcements (`_sdhelper._tcp`) reveal only the computer name, port, agent id and protocol version. Announcing is best effort; pairing by QR or IP works without it.
 
+### Phone: local network permission
+From Android 17 the platform blocks traffic to the local network for apps targeting SDK 37 until the user grants `ACCESS_LOCAL_NETWORK`. SDHelper asks for it only when the person opens a screen that talks to a computer, explains why, and does not connect or scan before it is granted. The permission is a platform privacy control and does not replace pairing or TLS pinning.
+
+### Phone: keys
+One EC P-256 key per paired computer lives in the Android Keystore (non-exportable, signing only) and is deleted when the computer is forgotten or pairing fails. The phone stores only the computer's address, name, certificate fingerprint and the device id; none of it is secret.
+
 ## 5. Plugin security (honest limits)
 - Plugins run as separate processes under the same Windows user as the agent. **There is no real sandbox.** Declared permissions are an informed-consent mechanism and are enforced where the agent mediates access (for example key injection through the host API), not against arbitrary code that a plugin process runs itself.
 - Install only plugins you trust. The catalog repository applies review (see `PLUGIN_REPO_PLAN.md`), which reduces but does not remove risk.
