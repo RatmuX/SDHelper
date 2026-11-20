@@ -6,7 +6,8 @@
 | 0 (done) | Requirements |
 | 1 (done) | Research and design documents |
 | 2 (done) | Skeleton: Gradle, version catalog, convention plugins, CI, lint, architecture tests, "hello" Android app and agent start |
-| 3 | Vertical slice: home menu, pairing, connection, deck grid, 2-3 real actions (system volume, mic mute, media), basic editor |
+| 3a, 3b (done) | Secure pairing and connection; deck channel, built-in actions (volume, speakers, microphone, media) on Windows through the native helper, DPAPI secrets, plain actions list on the phone. Verified on Windows 11 with a phone |
+| 3c | Vertical slice, last part: button grid with state colors and icons, pages, folders, profiles, basic editor |
 | 4 | Plugin system: manifest, out-of-process host, permission prompt, generated parameter UI, built-ins moved to plugins, one Python example plugin, developer guide |
 | 5 | Polish: Discord actions, state feedback everywhere, packaging (APK, Windows installer), Miuix flavor proof, README, screenshots, release process |
 

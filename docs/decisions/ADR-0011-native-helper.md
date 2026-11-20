@@ -18,6 +18,7 @@
 **Alternatives.** JNA/COM from the JVM (hand-written vtables, SMTC unreachable); a local socket instead of stdio (ports, authentication); event callbacks now (more unsafe code, no user-visible gain yet); falling back to plain files when DPAPI is unavailable (silently weakens the one thing DPAPI is for).
 
 **Consequences / not verified.**
-- Core Audio, SMTC and DPAPI run for the first time on a real Windows machine through CI and the owner's test; nothing of that could be run on the Linux development machine. The CI machine may have no audio device or player, so those tests accept "no device" answers.
+- **Verified by the owner on a real Windows 11 machine with a phone (end of Phase 3b):** volume, speaker and microphone mute, media control, live state on the phone, the CI test bundle (`SDHelperAgent.exe` with its own Java runtime and the helper) and the DPAPI-protected secrets all work. None of this could be run on the Linux development machine; Windows CI covers the DPAPI round trip and the JSON-RPC layer. The CI machine may have no audio device or player, so those tests accept "no device" answers.
+- **Linux has no real controllers yet.** Without `--demo-platform` a Linux agent publishes no actions (an empty control panel is expected); real Linux support follows the guide in `PORTING_LINUX.md`.
 - Volume steps are 5 percentage points; per-application volume, Discord and key injection are later work.
 - Polling costs a little CPU while the agent runs, even with no phone connected.
