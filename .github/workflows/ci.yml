@@ -20,7 +20,18 @@ jobs:
           distribution: temurin
           java-version: 21
       - uses: gradle/actions/setup-gradle@v4
-      - name: Check (tests, lint, style, architecture rules) and assemble
+      - name: "Native helper (portable part: JSON-RPC, polling, mock backend)"
+        working-directory: native/windows
+        run: |
+          rustup component add clippy rustfmt
+          cargo fmt --check
+          cargo clippy --all-targets -- -D warnings
+          cargo test
+          cargo build --release
+      - name: "Check (tests, lint, style, architecture rules) and assemble"
+        env:
+          # lets the agent tests also start the real helper process (it answers "unsupported" on Linux)
+          SDHELPER_NATIVE_PATH: ${{ github.workspace }}/native/windows/target/release/sdhelper-native
         run: ./gradlew check :app:android:assembleM3Debug --stacktrace
       - name: Build-logic tests
         run: ./gradlew -p build-logic test
@@ -35,5 +46,35 @@ jobs:
           distribution: temurin
           java-version: 21
       - uses: gradle/actions/setup-gradle@v4
+      - name: "Native helper (real Windows APIs: DPAPI round trip, JSON-RPC)"
+        working-directory: native/windows
+        run: |
+          cargo test
+          cargo build --release
       - name: Test and build the agent
-        run: ./gradlew :core:protocol:test :agent:core:test :agent:server:test :agent:desktop-app:build --continue --stacktrace
+        env:
+          SDHELPER_NATIVE_PATH: ${{ github.workspace }}\native\windows\target\release\sdhelper-native.exe
+        run: ./gradlew :core:protocol:test :agent:core:test :agent:server:test :agent:platform-windows:test :plugins:builtin-system-audio:test :plugins:builtin-media:test :agent:desktop-app:installDist --continue --stacktrace
+      - name: Package the agent with its own Java runtime
+        shell: pwsh
+        run: |
+          $lib = "agent/desktop-app/build/install/desktop-app/lib"
+          $jar = (Get-ChildItem $lib -Filter "desktop-app*.jar" | Select-Object -First 1).Name
+          jpackage --type app-image --name SDHelperAgent --dest dist `
+            --input $lib --main-jar $jar `
+            --main-class io.github.ratmux.sdhelper.agent.desktop.MainKt `
+            --java-options "--enable-native-access=ALL-UNNAMED" --win-console
+          Copy-Item native/windows/target/release/sdhelper-native.exe dist/SDHelperAgent/
+          @"
+          SDHelper agent (test build, not a release).
+          Run SDHelperAgent.exe. A window with a QR code and PIN opens; scan it with the SDHelper app.
+          sdhelper-native.exe must stay next to SDHelperAgent.exe.
+          Add --demo-platform to try the app with simulated volume and media.
+          "@ | Set-Content dist/SDHelperAgent/README.txt
+      - name: Upload the agent as a build artifact (14 days, not a release)
+        uses: actions/upload-artifact@v4
+        with:
+          name: sdhelper-agent-windows
+          path: dist/SDHelperAgent
+          retention-days: 14
+          if-no-files-found: error

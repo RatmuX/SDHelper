@@ -14,3 +14,4 @@ Format: Context, Decision, Alternatives, Consequences. Status: Accepted unless n
 | [0008](ADR-0008-tls-pairing-details.md) | TLS identity, pairing and authentication details |
 | [0009](ADR-0009-agent-ui-swing.md) | Temporary Swing agent interface and a console mode |
 | [0010](ADR-0010-phone-connection.md) | Phone side of the connection |
+| [0011](ADR-0011-native-helper.md) | Native Windows helper, DPAPI secrets and the test bundle |

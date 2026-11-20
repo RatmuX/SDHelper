@@ -77,6 +77,10 @@ Adding Linux means a new `agent:platform-linux` module (and `native/linux/` if n
 
 `PlatformServices(secrets, audio?, media?, close)` is what the agent needs from the operating system. `AudioController` and `MediaController` (in `agent:core`) are ports with in-memory implementations used for tests and for `--demo-platform`; a `null` controller means the platform has none and its actions are not published. `ProviderRegistry` collects the `ActionProvider`s (the built-in plugins), and `DeckChannelHandler` serves the `deck` channel: catalog, `invoke`, and state pushes to all connected phones through the per-connection `SessionSink`.
 
+## 4b. Native helper (Phase 3b)
+
+`native/windows` (Rust) is started by `agent:platform-windows` and spoken to with JSON-RPC over stdio: audio (Core Audio), media sessions (SMTC) and DPAPI. `NativeHelper` manages the process, `WindowsAudioController`, `WindowsMediaController` and `DpapiSecretStore` sit on top, `WindowsPlatform` assembles them into `PlatformServices`. Details, limits and what is not verified: ADR-0011.
+
 ## 5. Surfaces (future-proofing)
 
 The home menu lists registered surfaces: `Surface(id, titleRes, icon, route, requiredCapabilities)`.

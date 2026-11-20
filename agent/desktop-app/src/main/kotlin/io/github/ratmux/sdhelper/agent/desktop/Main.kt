@@ -5,10 +5,13 @@ import io.github.ratmux.sdhelper.agent.core.AgentPaths
 import io.github.ratmux.sdhelper.agent.core.platform.PlatformServices
 import io.github.ratmux.sdhelper.agent.desktop.ui.ConsoleUi
 import io.github.ratmux.sdhelper.agent.desktop.ui.SwingUi
+import io.github.ratmux.sdhelper.agent.platform.windows.NativeHelperLocator
+import io.github.ratmux.sdhelper.agent.platform.windows.WindowsPlatform
 import io.github.ratmux.sdhelper.agent.server.AgentServer
 import kotlinx.coroutines.runBlocking
 import java.awt.GraphicsEnvironment
 import java.nio.file.Path
+import kotlin.system.exitProcess
 
 /**
  * Starts the agent.
@@ -43,6 +46,21 @@ private fun createPlatform(
         demo -> {
             println("DEMO PLATFORM: volume, microphone and media are simulated in memory.")
             PlatformServices.demo(configDirectory)
+        }
+
+        System.getProperty("os.name").orEmpty().startsWith("Windows", ignoreCase = true) -> {
+            val helper =
+                NativeHelperLocator.find()
+                    ?: run {
+                        System.err.println(
+                            "sdhelper-native.exe was not found. Looked in:\n" +
+                                NativeHelperLocator.candidates().joinToString("\n") { "  $it" } +
+                                "\nSet ${NativeHelperLocator.ENV} to its location.",
+                        )
+                        exitProcess(1)
+                    }
+            println("Windows platform with native helper: $helper")
+            WindowsPlatform.create(helper, configDirectory)
         }
 
         else -> {

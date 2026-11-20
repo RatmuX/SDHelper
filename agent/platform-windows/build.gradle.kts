@@ -1,7 +1,10 @@
 plugins {
     id("sdhelper.jvm-library")
+    id("org.jetbrains.kotlin.plugin.serialization")
 }
 
 dependencies {
-    implementation(project(":agent:core"))
+    api(project(":agent:core"))
+
+    testImplementation(libs.kotlinx.coroutines.test)
 }

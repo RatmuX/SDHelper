@@ -3,6 +3,8 @@
 The agent is built so that Linux support is a new platform module. Nothing in `agent:core`, `core:*` or the Android app should change.
 
 ## 1. What to implement
+Today the ports that exist as code are `AudioController`, `MediaController` and `SecretStore`, bundled in `PlatformServices` (`agent:core`). `KeyInjector`, `ForegroundWindowProvider` and `AutostartManager` are defined when the first feature needs them (Discord keybinds, profile switching, autostart). The Linux module returns a `PlatformServices` with its own implementations; if D-Bus is easier outside the JVM, a `native/linux` helper can speak the same JSON-RPC protocol as `native/windows` (see ADR-0011).
+
 Create `agent/platform-linux` implementing the port interfaces from `agent:core`:
 
 | Port | Windows (v1) | Linux candidates |

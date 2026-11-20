@@ -19,7 +19,7 @@ SDHelper lets a phone press keys and run actions on a computer. A paired device 
 | Malformed or flooding messages | Size limit, strict parsing, per-device rate limit, connection closed on repeated violations |
 | Malicious plugin | Permissions declared in the manifest and approved by the user at install; honest limit below |
 | Secrets in the repository | `.gitignore` excludes keys; CI secret scanning; Android keys live in the Keystore |
-| Agent TLS key readable by other local users | Key store and its password are files readable only by the owner (`rw-------` on POSIX, user-profile ACL on Windows). **Windows DPAPI protection is not implemented yet (planned for Phase 3b); until then any process running as the same user can read the key.** |
+| Agent TLS key readable by other local users | The key store password is encrypted with the Windows Data Protection API through the native helper (`<name>.secret.dpapi`); other Windows users and offline disk access cannot read it, and the agent never falls back to a plain file. **Malware running as the same Windows user can still decrypt it**: DPAPI does not defend against that. On POSIX systems (development) the files are readable only by the owner. |
 
 ## 3. Pairing flow
 See `PROTOCOL.md` section 3 for messages. Summary:
