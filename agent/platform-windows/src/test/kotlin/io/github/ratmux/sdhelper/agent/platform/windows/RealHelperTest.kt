@@ -48,13 +48,10 @@ class RealHelperTest {
                     .jsonPrimitive.content
                     .isNotBlank(),
             )
-            assertEquals(
-                if (isWindows) "windows" else System.getProperty("os.name").lowercase().take(5),
-                version
-                    .getValue("os")
-                    .jsonPrimitive.content
-                    .take(5),
-            )
+            // Rust reports "windows", "linux" or "macos"; Java reports "Windows 11", "Linux", "Mac OS X".
+            val javaOs = System.getProperty("os.name").orEmpty().lowercase()
+            val expected = listOf("windows", "linux").firstOrNull { javaOs.startsWith(it) } ?: "macos"
+            assertEquals(expected, version.getValue("os").jsonPrimitive.content)
             helper.close()
         }
 
