@@ -1,7 +1,9 @@
 package io.github.ratmux.sdhelper.agent.core
 
+import java.nio.file.FileSystems
 import java.nio.file.Files
 import java.nio.file.Path
+import java.nio.file.Paths
 import java.nio.file.attribute.PosixFilePermission
 import kotlin.io.path.exists
 import kotlin.test.Test
@@ -55,8 +57,11 @@ class StorageTest {
         assertNotEquals(first, store.getOrCreate("other"))
         assertTrue(first.length >= 32)
 
-        val permissions = Files.getPosixFilePermissions(dir.resolve("secrets/tls.secret"))
-        assertEquals(setOf(PosixFilePermission.OWNER_READ, PosixFilePermission.OWNER_WRITE), permissions)
+        // POSIX permissions exist on Linux and macOS only; on Windows the user-profile ACL applies instead.
+        if ("posix" in FileSystems.getDefault().supportedFileAttributeViews()) {
+            val permissions = Files.getPosixFilePermissions(dir.resolve("secrets/tls.secret"))
+            assertEquals(setOf(PosixFilePermission.OWNER_READ, PosixFilePermission.OWNER_WRITE), permissions)
+        }
     }
 
     @Test
@@ -75,13 +80,19 @@ class StorageTest {
 
     @Test
     fun `config directory follows platform conventions and the override`() {
-        assertEquals("/h/.config/sdhelper", AgentPaths.configDirectory("Linux", emptyMap(), "/h").toString())
+        // Compared as paths, not strings: the separator differs between Windows and Linux.
+        assertEquals(Paths.get("/h", ".config", "sdhelper"), AgentPaths.configDirectory("Linux", emptyMap(), "/h"))
         assertEquals(
-            "/x/sdhelper",
-            AgentPaths.configDirectory("Linux", mapOf("XDG_CONFIG_HOME" to "/x"), "/h").toString(),
+            Paths.get("/x", "sdhelper"),
+            AgentPaths.configDirectory("Linux", mapOf("XDG_CONFIG_HOME" to "/x"), "/h"),
         )
-        val windows = AgentPaths.configDirectory("Windows 11", mapOf("APPDATA" to "/appdata"), "/h")
-        assertEquals("SDHelper", windows.fileName.toString())
-        assertEquals("/o", AgentPaths.configDirectory("Linux", mapOf(AgentPaths.OVERRIDE_ENV to "/o"), "/h").toString())
+        assertEquals(
+            Paths.get("/appdata", "SDHelper"),
+            AgentPaths.configDirectory("Windows 11", mapOf("APPDATA" to "/appdata"), "/h"),
+        )
+        assertEquals(
+            Paths.get("/o"),
+            AgentPaths.configDirectory("Linux", mapOf(AgentPaths.OVERRIDE_ENV to "/o"), "/h"),
+        )
     }
 }

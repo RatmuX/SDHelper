@@ -36,4 +36,4 @@ jobs:
           java-version: 21
       - uses: gradle/actions/setup-gradle@v4
       - name: Test and build the agent
-        run: ./gradlew :core:protocol:test :agent:core:test :agent:desktop-app:build --stacktrace
+        run: ./gradlew :core:protocol:test :agent:core:test :agent:server:test :agent:desktop-app:build --continue --stacktrace
