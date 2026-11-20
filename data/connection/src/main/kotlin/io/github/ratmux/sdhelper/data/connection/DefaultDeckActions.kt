@@ -1,5 +1,6 @@
 package io.github.ratmux.sdhelper.data.connection
 
+import io.github.ratmux.sdhelper.core.model.ActionCatalogCache
 import io.github.ratmux.sdhelper.core.model.ConnectionState
 import io.github.ratmux.sdhelper.core.model.ConnectionStatus
 import io.github.ratmux.sdhelper.core.model.DeckAction
@@ -45,11 +46,13 @@ interface DeckTransport {
 class DefaultDeckActions(
     status: ConnectionStatus,
     private val transport: DeckTransport,
-    scope: CoroutineScope,
+    private val scope: CoroutineScope,
     private val language: () -> String = { Locale.getDefault().language },
     private val timeoutMillis: Long = INVOKE_TIMEOUT_MILLIS,
     /** Diagnostic messages (action ids and outcomes only); the app routes them to logcat. */
     private val log: (String) -> Unit = {},
+    /** Remembers every catalog, so layouts keep titles and icons while no computer is connected. */
+    private val cache: ActionCatalogCache? = null,
 ) : DeckActions {
     private val currentActions = MutableStateFlow<List<DeckAction>>(emptyList())
     private val currentStates = MutableStateFlow<Map<String, DeckActionState>>(emptyMap())
@@ -113,7 +116,9 @@ class DefaultDeckActions(
             log("received deck/${message.type}")
             when (message.type) {
                 DeckTypes.CATALOG -> {
-                    currentActions.value = message.payloadAs<Catalog>().actions.map(::toAction)
+                    val actions = message.payloadAs<Catalog>().actions.map(::toAction)
+                    currentActions.value = actions
+                    cache?.let { scope.launch { runCatching { it.update(actions) } } }
                 }
 
                 DeckTypes.STATE -> {

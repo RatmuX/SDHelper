@@ -15,7 +15,9 @@ import io.github.ratmux.sdhelper.agent.core.platform.InMemoryAudioController
 import io.github.ratmux.sdhelper.agent.core.platform.InMemoryMediaController
 import io.github.ratmux.sdhelper.agent.server.AgentServer
 import io.github.ratmux.sdhelper.agent.server.TlsIdentity
+import io.github.ratmux.sdhelper.core.model.ActionCatalogCache
 import io.github.ratmux.sdhelper.core.model.ComputerDiscovery
+import io.github.ratmux.sdhelper.core.model.DeckAction
 import io.github.ratmux.sdhelper.core.model.DiscoveredComputer
 import io.github.ratmux.sdhelper.core.model.LocalNetworkAccess
 import io.github.ratmux.sdhelper.core.model.PairedComputer
@@ -159,4 +161,15 @@ class FakeDiscovery : ComputerDiscovery {
     val announcements = MutableSharedFlow<List<DiscoveredComputer>>(replay = 1)
 
     override fun discover(): Flow<List<DiscoveredComputer>> = announcements.map { it }
+}
+
+class FakeCatalogCache : ActionCatalogCache {
+    private val state = MutableStateFlow<List<DeckAction>>(emptyList())
+    val remembered: List<DeckAction> get() = state.value
+
+    override val actions: Flow<List<DeckAction>> get() = state
+
+    override suspend fun update(actions: List<DeckAction>) {
+        state.value = (state.value.associateBy { it.id } + actions.associateBy { it.id }).values.toList()
+    }
 }

@@ -178,4 +178,15 @@ class DeckActionsIntegrationTest {
                 deck.states.first { it.size >= 7 }
             }
         }
+
+    @Test
+    fun `the catalog is remembered in the cache for offline use`() =
+        run {
+            val cache = FakeCatalogCache()
+            val deck = DefaultDeckActions(manager, manager, scope, language = { "en" }, cache = cache)
+            connect(deck)
+
+            withTimeout(10_000) { while (cache.remembered.size < 7) kotlinx.coroutines.delay(20) }
+            assertEquals("Mute microphone", cache.remembered.first { it.id.endsWith("mute-microphone") }.title)
+        }
 }

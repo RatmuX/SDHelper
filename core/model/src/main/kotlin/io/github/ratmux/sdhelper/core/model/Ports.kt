@@ -99,3 +99,42 @@ interface LocalNetworkAccess {
         const val MIN_SDK = 37
     }
 }
+
+/** Phone-wide preferences. */
+data class AppSettings(
+    /** Short vibration when a button is pressed on the control panel. */
+    val hapticFeedback: Boolean = true,
+    /** Keep the screen on while the control panel is open. */
+    val keepScreenOn: Boolean = true,
+)
+
+/** Persistent [AppSettings]. Implemented by `data:settings`. */
+interface SettingsStore {
+    val settings: Flow<AppSettings>
+
+    suspend fun update(transform: (AppSettings) -> AppSettings)
+}
+
+/** Persistent layouts. Implemented by `data:profiles`. There is always at least one profile once the app has started. */
+interface ProfileStore {
+    val profiles: Flow<List<DeckProfile>>
+
+    /** Id of the profile shown on the control panel, or null before the first profile exists. */
+    val activeProfileId: Flow<String?>
+
+    /** Adds the profile or replaces the one with the same id. The first profile ever saved becomes active. */
+    suspend fun save(profile: DeckProfile)
+
+    /** Returns false (and deletes nothing) for the last remaining profile. Deleting the active one activates another. */
+    suspend fun delete(profileId: String): Boolean
+
+    suspend fun setActive(profileId: String)
+}
+
+/** The last known actions of any computer, so layouts show and can be edited while no computer is connected. */
+interface ActionCatalogCache {
+    val actions: Flow<List<DeckAction>>
+
+    /** Adds new actions and refreshes known ones; actions of other computers stay. */
+    suspend fun update(actions: List<DeckAction>)
+}

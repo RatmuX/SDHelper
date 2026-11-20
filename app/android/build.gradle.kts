@@ -32,6 +32,8 @@ dependencies {
     implementation(project(":feature:connection"))
     implementation(project(":feature:deck"))
     implementation(project(":data:devices"))
+    implementation(project(":data:profiles"))
+    implementation(project(":data:settings"))
     implementation(project(":data:connection"))
 
     // The only place where a concrete design module is wired in.

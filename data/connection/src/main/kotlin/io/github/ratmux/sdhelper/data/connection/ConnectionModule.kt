@@ -24,7 +24,13 @@ val connectionModule =
         single<ConnectionStatus> { get<DefaultConnectionManager>() }
         single<DeckTransport> { get<DefaultConnectionManager>() }
         single<DeckActions> {
-            DefaultDeckActions(get(), get(), get(APP_SCOPE), log = { message -> Log.d("SDHelper", message) })
+            DefaultDeckActions(
+                get(),
+                get(),
+                get(APP_SCOPE),
+                log = { message -> Log.d("SDHelper", message) },
+                cache = get(),
+            )
         }
         single<PairingClient> { DefaultPairingClient(get()) { Build.MODEL } }
         single<ComputerDiscovery> { NsdComputerDiscovery(androidContext()) }

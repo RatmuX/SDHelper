@@ -19,6 +19,7 @@ class KoinGraphTest {
                     Backoff::class,
                     Function0::class,
                     Long::class,
+                    String::class,
                 ),
         )
     }
