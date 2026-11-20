@@ -1,5 +1,6 @@
 package io.github.ratmux.sdhelper.agent.desktop
 
+import io.github.ratmux.sdhelper.agent.core.platform.PlatformServices
 import io.github.ratmux.sdhelper.core.protocol.PairingUri
 import java.nio.file.Files
 import kotlin.test.Test
@@ -12,7 +13,15 @@ class AgentRuntimeTest {
     fun `runtime starts, keeps its identity across restarts and builds a valid pairing uri`() {
         val dir = Files.createTempDirectory("sdhelper-runtime-test")
 
-        val first = AgentRuntime({ true }, dir, port = 0, bindHost = "127.0.0.1", announce = false)
+        val first =
+            AgentRuntime(
+                { true },
+                PlatformServices.fileBased(dir),
+                dir,
+                port = 0,
+                bindHost = "127.0.0.1",
+                announce = false,
+            )
         first.start()
         val offer = first.pairing.newOffer()
         val parsed = assertNotNull(PairingUri.parse(first.pairingUri("192.168.1.2", offer).toUriString()))
@@ -21,7 +30,15 @@ class AgentRuntimeTest {
         assertTrue(first.boundPort > 0)
         first.stop()
 
-        val second = AgentRuntime({ true }, dir, port = 0, bindHost = "127.0.0.1", announce = false)
+        val second =
+            AgentRuntime(
+                { true },
+                PlatformServices.fileBased(dir),
+                dir,
+                port = 0,
+                bindHost = "127.0.0.1",
+                announce = false,
+            )
         assertEquals(first.identity.agentId, second.identity.agentId)
         assertEquals(first.tls.fingerprint, second.tls.fingerprint) // phones keep trusting the same certificate
     }

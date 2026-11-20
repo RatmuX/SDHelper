@@ -32,4 +32,39 @@ class MessagesTest {
         assertNotEquals(a.toList(), AuthSigning.signedBytes(nonce, "bb".repeat(32)).toList())
         assertNotEquals(a.toList(), AuthSigning.signedBytes(ByteArray(32), "aa".repeat(32)).toList())
     }
+
+    @Test
+    fun `deck messages round trip with maps and optional fields`() {
+        val catalog =
+            Catalog(
+                listOf(
+                    DeckActionInfo(
+                        "builtin.media/play-pause",
+                        mapOf("en" to "Play", "tr" to "Oynat"),
+                        "play_pause",
+                        true,
+                    ),
+                    DeckActionInfo("builtin.media/next", mapOf("en" to "Next")),
+                ),
+            )
+        val decoded = Protocol.decode(Protocol.encode(deckMessage(DeckTypes.CATALOG, catalog, id = "c1")))
+
+        assertEquals(Channels.DECK, decoded.channel)
+        assertEquals(catalog, decoded.payloadAs<Catalog>())
+    }
+
+    @Test
+    fun `state update keeps tone and tolerates missing optional fields`() {
+        val update = StateUpdate("a/b", WireActionState(toggled = true, label = "42%", tone = "ALERT"))
+        assertEquals(update, deckMessage(DeckTypes.STATE, update).payloadAs<StateUpdate>())
+
+        val minimal = Protocol.decode("""{"v":1,"ch":"deck","type":"state","payload":{"actionId":"a/b","state":{}}}""")
+        assertEquals(WireActionState(), minimal.payloadAs<StateUpdate>().state)
+    }
+
+    @Test
+    fun `invoke defaults to no parameters`() {
+        val invoke = Protocol.decode("""{"v":1,"ch":"deck","type":"invoke","payload":{"actionId":"a/b"}}""")
+        assertEquals(emptyMap(), invoke.payloadAs<Invoke>().params)
+    }
 }

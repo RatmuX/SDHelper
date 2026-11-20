@@ -56,9 +56,19 @@ Until authenticated, only `hello`, `ping`, `pair.request` and `auth.response` ar
 
 ## 4. Deck channel
 
-- `catalog`: list of available actions with parameter schemas and plugin ids (sent after auth and when plugins change).
-- `invoke` `{ actionId, params, buttonId }` → reply `result` `{ ok, error? }`. `invoke` is idempotent when the same `id` is replayed within 10 seconds.
-- `state` `{ buttonId | actionKey, title?, icon?, color?, toggled? }` pushed by the agent when action state changes (for example microphone muted).
+Only authenticated devices reach this channel. Actions are identified as `providerId/actionId`, for example `builtin.system-audio/mute-microphone`.
+
+| Direction | Type | Payload | Meaning |
+|---|---|---|---|
+| phone → agent | `catalog.get` | none | ask for the catalog |
+| agent → phone | `catalog` | `{ actions: [{ id, title: {lang: text}, icon?, toggle }] }` | the published actions; `title` is localized, clients fall back to `en` |
+| agent → phone | `state` | `{ actionId, state: { available, toggled?, label?, tone } }` | current state; one message per action in reply to `catalog.get`, then pushed on every change |
+| phone → agent | `invoke` | `{ actionId, params: {string: string} }` | run an action; `params` has at most 16 entries of at most 256 characters |
+| agent → phone | `result` | `{ ok, error? }` | answer to `invoke` with the same `id`; `ok=false` for unknown actions, malformed requests, failures, and actions that take longer than 10 s |
+
+- `tone` is one of `NORMAL`, `ACTIVE`, `WARNING`, `ALERT` (a meaning, not a color; unknown values mean `NORMAL`). `available=false` means the action cannot work right now (for example no microphone is present).
+- Unknown message types on this channel are answered with `control/error unsupported_type`.
+- The agent keeps one outgoing queue per connection (256 messages). A phone that cannot keep up is disconnected; on reconnect it fetches the catalog and all states again, so no state is lost.
 
 ## 5. Reliability
 

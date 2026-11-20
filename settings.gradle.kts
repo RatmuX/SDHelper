@@ -37,4 +37,6 @@ include(
     ":agent:server",
     ":agent:platform-windows",
     ":agent:desktop-app",
+    ":plugins:builtin-system-audio",
+    ":plugins:builtin-media",
 )

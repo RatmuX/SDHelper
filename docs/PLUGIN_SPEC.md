@@ -11,6 +11,20 @@ my-plugin/
   main.py | main.js | my-plugin.jar | my-plugin.exe
 ```
 
+## 1a. The action provider interface (in-process, Phase 3b)
+
+Built-in actions already implement this interface (`core:plugin-api`); external plugins will be adapted to it in Phase 4:
+
+```kotlin
+interface ActionProvider {
+    val providerId: String
+    fun actions(): List<ActionDescriptor>      // id, localized title, icon key, toggle
+    val states: Flow<Map<String, ActionState>> // current state first, then every change
+    suspend fun invoke(actionId: String, params: Map<String, String>): ActionResult
+}
+```
+`ActionState(available, toggled?, label?, tone)` carries what a button needs to look right; `tone` is a meaning (`NORMAL`, `ACTIVE`, `WARNING`, `ALERT`) that each design language maps to its own colors, so plugins never choose colors. The agent publishes actions as `providerId/actionId` (see `PROTOCOL.md` section 4).
+
 ## 2. Manifest (`plugin.json`)
 
 ```json

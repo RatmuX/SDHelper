@@ -19,3 +19,8 @@ kotlin {
 dependencies {
     "testImplementation"(kotlin("test-junit"))
 }
+
+// Test code may use the experimental parts of the coroutines test library (virtual time, test dispatchers).
+tasks.named<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>("compileTestKotlin") {
+    compilerOptions.optIn.add("kotlinx.coroutines.ExperimentalCoroutinesApi")
+}

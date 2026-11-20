@@ -73,6 +73,10 @@ Dependency rules (enforced, see section 8):
 
 Adding Linux means a new `agent:platform-linux` module (and `native/linux/` if needed) implementing the same interfaces. Core code is not changed. See `PORTING_LINUX.md`.
 
+## 4a. Platform services and the deck (Phase 3b)
+
+`PlatformServices(secrets, audio?, media?, close)` is what the agent needs from the operating system. `AudioController` and `MediaController` (in `agent:core`) are ports with in-memory implementations used for tests and for `--demo-platform`; a `null` controller means the platform has none and its actions are not published. `ProviderRegistry` collects the `ActionProvider`s (the built-in plugins), and `DeckChannelHandler` serves the `deck` channel: catalog, `invoke`, and state pushes to all connected phones through the per-connection `SessionSink`.
+
 ## 5. Surfaces (future-proofing)
 
 The home menu lists registered surfaces: `Surface(id, titleRes, icon, route, requiredCapabilities)`.

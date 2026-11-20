@@ -7,17 +7,25 @@ import io.github.ratmux.sdhelper.agent.core.AgentPaths
 import io.github.ratmux.sdhelper.agent.core.ChallengeAuthenticator
 import io.github.ratmux.sdhelper.agent.core.ChannelRegistry
 import io.github.ratmux.sdhelper.agent.core.ControlSession
+import io.github.ratmux.sdhelper.agent.core.DeckChannelHandler
 import io.github.ratmux.sdhelper.agent.core.DeviceRegistry
 import io.github.ratmux.sdhelper.agent.core.FileDeviceRegistry
-import io.github.ratmux.sdhelper.agent.core.FileSecretStore
 import io.github.ratmux.sdhelper.agent.core.PairingApproval
 import io.github.ratmux.sdhelper.agent.core.PairingOffer
 import io.github.ratmux.sdhelper.agent.core.PairingService
+import io.github.ratmux.sdhelper.agent.core.ProviderRegistry
+import io.github.ratmux.sdhelper.agent.core.platform.PlatformServices
 import io.github.ratmux.sdhelper.agent.server.AgentServer
 import io.github.ratmux.sdhelper.agent.server.MdnsAdvertiser
 import io.github.ratmux.sdhelper.agent.server.PrivateNetwork
 import io.github.ratmux.sdhelper.agent.server.TlsIdentity
 import io.github.ratmux.sdhelper.core.protocol.PairingUri
+import io.github.ratmux.sdhelper.plugins.builtinmedia.MediaProvider
+import io.github.ratmux.sdhelper.plugins.builtinsystemaudio.SystemAudioProvider
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import java.net.InetAddress
 import java.nio.file.Path
 
@@ -27,6 +35,7 @@ import java.nio.file.Path
  */
 class AgentRuntime(
     approval: PairingApproval,
+    private val platform: PlatformServices,
     configDirectory: Path = AgentPaths.configDirectory(),
     private val port: Int = AgentServer.DEFAULT_PORT,
     bindHost: String = "0.0.0.0",
@@ -34,20 +43,26 @@ class AgentRuntime(
 ) {
     val identity: AgentIdentity =
         AgentIdentityStore.loadOrCreate(configDirectory, computerName(), AgentInfo().version)
-    val tls: TlsIdentity =
-        TlsIdentity.loadOrCreate(
-            configDirectory.resolve("tls.p12"),
-            FileSecretStore(configDirectory.resolve("secrets")),
-        )
+    val tls: TlsIdentity = TlsIdentity.loadOrCreate(configDirectory.resolve("tls.p12"), platform.secrets)
     val registry: DeviceRegistry = FileDeviceRegistry(configDirectory.resolve("devices.json"))
     val pairing = PairingService(registry, tls.fingerprint, approval)
 
     private val authenticator = ChallengeAuthenticator(registry, tls.fingerprint)
-    private val channels = ChannelRegistry() // channel handlers (deck, later keyboard/touchpad) register here
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+    private val channels =
+        ChannelRegistry().also { registry ->
+            // Built-in actions run on whatever the platform offers; a missing controller means no such actions.
+            val providers =
+                listOfNotNull(
+                    platform.audio?.let(::SystemAudioProvider),
+                    platform.media?.let(::MediaProvider),
+                )
+            registry.register(DeckChannelHandler(ProviderRegistry(providers), scope))
+        }
     private val server =
         AgentServer(
             tls = tls,
-            newSession = { ControlSession(identity, pairing, authenticator, channels) },
+            newSession = { sink -> ControlSession(identity, pairing, authenticator, channels, sink = sink) },
             port = port,
             bindHost = bindHost,
         )
@@ -70,6 +85,8 @@ class AgentRuntime(
     fun stop() {
         advertiser?.close()
         server.stop()
+        scope.cancel()
+        platform.close()
     }
 
     /** IPv4 addresses a phone on the same network could use to reach this computer. */

@@ -57,7 +57,7 @@ class ServerFixture {
     val server =
         AgentServer(
             tls,
-            { ControlSession(identity, pairing, authenticator, channels) },
+            { sink -> ControlSession(identity, pairing, authenticator, channels, sink = sink) },
             port = 0,
             bindHost = "127.0.0.1",
         )

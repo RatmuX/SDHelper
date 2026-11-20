@@ -7,6 +7,8 @@ dependencies {
     implementation(project(":agent:core"))
     implementation(project(":agent:server"))
     implementation(project(":agent:platform-windows"))
+    implementation(project(":plugins:builtin-system-audio"))
+    implementation(project(":plugins:builtin-media"))
     implementation(libs.zxing.core)
     runtimeOnly(libs.slf4j.simple)
 

@@ -112,10 +112,18 @@ inline fun <reified T> controlMessage(
     type: String,
     payload: T,
     id: String? = null,
+): Envelope = message(Channels.CONTROL, type, payload, id)
+
+/** Builds an envelope for any channel from a serializable payload. */
+inline fun <reified T> message(
+    channel: String,
+    type: String,
+    payload: T,
+    id: String? = null,
 ): Envelope =
     Envelope(
         version = Protocol.VERSION,
-        channel = Channels.CONTROL,
+        channel = channel,
         type = type,
         id = id,
         payload = Protocol.json.encodeToJsonElement(payload).jsonObject,

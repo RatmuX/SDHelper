@@ -9,8 +9,8 @@ dependencies {
     implementation(libs.ktor.network.tls.certificates)
     implementation(libs.jmdns)
 
-    testImplementation(libs.ktor.client.cio)
-    testImplementation(libs.ktor.client.websockets)
+    testImplementation(project(":plugins:builtin-system-audio"))
+    testImplementation(project(":plugins:builtin-media"))
     testImplementation(libs.kotlinx.coroutines.test)
     testRuntimeOnly(libs.slf4j.simple)
 }

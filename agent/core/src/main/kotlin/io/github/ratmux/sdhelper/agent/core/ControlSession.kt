@@ -41,11 +41,13 @@ class ControlSession(
     private val authenticator: ChallengeAuthenticator,
     private val channels: ChannelRegistry,
     private val limiter: RateLimiter = RateLimiter(),
+    private val sink: SessionSink = SessionSink { false },
 ) {
     /** The authenticated or just-paired device, or null while the connection is anonymous. */
     var device: PairedDevice? = null
         private set
 
+    private var handle: SessionHandle? = null
     private var greeted = false
     private var challenge: Challenge? = null
     private var violations = 0
@@ -58,7 +60,7 @@ class ControlSession(
 
         val current = device
         if (current != null && !authenticator.isPaired(current.deviceId)) {
-            device = null
+            endSession()
             return fail(message, ErrorCodes.UNAUTHENTICATED, "device was revoked", close = true)
         }
         return if (message.channel == Channels.CONTROL) handleControl(message) else handleChannel(message, current)
@@ -118,7 +120,7 @@ class ControlSession(
                 ?: return fail(message, ErrorCodes.MALFORMED, "invalid pair.request", close = true)
         return when (val result = pairing.handle(request)) {
             is PairingResult.Accepted -> {
-                device = result.device
+                authenticate(result.device)
                 SessionReaction(
                     listOf(
                         controlMessage(
@@ -146,7 +148,7 @@ class ControlSession(
         if (verified == null) {
             return fail(message, ErrorCodes.UNAUTHENTICATED, "authentication failed", close = true)
         }
-        device = verified
+        authenticate(verified)
         return SessionReaction(listOf(controlMessage(ControlTypes.AUTH_OK, EmptyPayload(), message.id)))
     }
 
@@ -159,6 +161,22 @@ class ControlSession(
             channels.find(message.channel)
                 ?: return violation(message, ErrorCodes.UNSUPPORTED_TYPE, "channel ${message.channel}")
         return SessionReaction(handler.handle(current, message))
+    }
+
+    private fun authenticate(authenticated: PairedDevice) {
+        device = authenticated
+        val started = SessionHandle(authenticated, sink)
+        handle = started
+        channels.all().forEach { it.onSessionStarted(started) }
+    }
+
+    /** Call when the connection ends, so channel handlers can forget this session. Safe to call twice. */
+    fun onClosed() = endSession()
+
+    private fun endSession() {
+        handle?.let { ended -> channels.all().forEach { it.onSessionEnded(ended) } }
+        handle = null
+        device = null
     }
 
     /** Protocol error that keeps the connection, but too many of them close it. */

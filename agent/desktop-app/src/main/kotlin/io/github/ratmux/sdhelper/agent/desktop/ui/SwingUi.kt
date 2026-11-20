@@ -3,6 +3,7 @@ package io.github.ratmux.sdhelper.agent.desktop.ui
 import io.github.ratmux.sdhelper.agent.core.PairedDevice
 import io.github.ratmux.sdhelper.agent.core.PairingApproval
 import io.github.ratmux.sdhelper.agent.core.PairingApprovalRequest
+import io.github.ratmux.sdhelper.agent.core.platform.PlatformServices
 import io.github.ratmux.sdhelper.agent.desktop.AgentRuntime
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -18,6 +19,7 @@ import java.awt.Font
 import java.awt.SystemTray
 import java.awt.TrayIcon
 import java.awt.image.BufferedImage
+import java.nio.file.Path
 import javax.swing.BorderFactory
 import javax.swing.BoxLayout
 import javax.swing.DefaultListModel
@@ -215,9 +217,14 @@ class SwingUi private constructor(
         private const val TRAY_ARC = 8
         private const val TRAY_COLOR = 0x3F51B5
 
-        fun launch(port: Int) {
+        fun launch(
+            port: Int,
+            platform: PlatformServices,
+            configDirectory: Path,
+        ) {
             val ui = SwingUi(CoroutineScope(SupervisorJob() + Dispatchers.Default))
-            ui.runtime = AgentRuntime(approval = ui, port = port)
+            ui.runtime =
+                AgentRuntime(approval = ui, platform = platform, configDirectory = configDirectory, port = port)
             ui.runtime.start()
             Runtime.getRuntime().addShutdownHook(Thread { ui.runtime.stop() })
             SwingUtilities.invokeLater { ui.show() }
