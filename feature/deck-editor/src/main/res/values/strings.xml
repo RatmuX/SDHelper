@@ -53,4 +53,20 @@
     <string name="layouts_delete_confirm">Delete</string>
     <string name="layouts_last">There must be at least one layout, so the last one cannot be deleted.</string>
     <string name="layouts_default_name">New layout</string>
+    <string name="editor_cell_make_folder">Make a folder here…</string>
+    <string name="editor_cell_open_folder">Open folder</string>
+    <string name="editor_cell_rename_folder">Rename folder…</string>
+    <string name="editor_cell_remove_folder">Remove folder…</string>
+    <string name="editor_folder_name">Folder name</string>
+    <string name="editor_default_folder">Folder</string>
+    <string name="editor_folder_hint">Tap an empty cell to add a button. Press and hold a button and drag it to change the order.</string>
+    <string name="editor_folder_back">Back</string>
+    <string name="editor_folder_rename">Rename</string>
+    <string name="editor_folder_delete_title">Remove folder?</string>
+    <string name="editor_folder_delete_message">The folder \"%1$s\" and the %2$d buttons in it will be removed from this layout.</string>
+    <string name="editor_folder_item_change">Choose another action…</string>
+    <string name="editor_folder_item_remove">Remove from folder</string>
+    <string name="editor_folder_item_out">Move out of the folder</string>
+    <string name="editor_message_folder_full">The folder is full.</string>
+    <string name="editor_message_no_free_cell">There is no free cell to move it to.</string>
 </resources>

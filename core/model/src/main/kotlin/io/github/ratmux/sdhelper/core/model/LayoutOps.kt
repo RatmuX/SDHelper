@@ -40,7 +40,109 @@ object LayoutOps {
         if (from == to || !profile.contains(from) || !profile.contains(to)) return profile
         val moving = profile.slotAt(from) ?: return profile
         val displaced = profile.slotAt(to)
+        // dropping a button onto a folder puts it into the folder (a full folder refuses it)
+        if (moving is DeckSlot.Action && displaced is DeckSlot.Folder) {
+            if (displaced.actions.size >= LayoutLimits.MAX_FOLDER_ACTIONS) return profile
+            return clear(setSlot(profile, to, displaced.copy(actions = displaced.actions + moving.actionId)), from)
+        }
         return setSlot(setSlot(profile, to, moving), from, displaced)
+    }
+
+    /** Puts an empty folder named [name] into an empty cell. Anything else changes nothing. */
+    fun createFolder(
+        profile: DeckProfile,
+        at: SlotPosition,
+        name: String,
+        id: String = LayoutIds.random(),
+    ): DeckProfile {
+        if (!profile.contains(at) || profile.slotAt(at) != null) return profile
+        return setSlot(profile, at, DeckSlot.Folder(id, cleanName(name) ?: "Folder"))
+    }
+
+    fun renameFolder(
+        profile: DeckProfile,
+        at: SlotPosition,
+        name: String,
+    ): DeckProfile {
+        val clean = cleanName(name) ?: return profile
+        return changeFolder(profile, at) { it.copy(name = clean) }
+    }
+
+    /** Appends an action to the folder at [at]; a full folder refuses it. */
+    fun addToFolder(
+        profile: DeckProfile,
+        at: SlotPosition,
+        actionId: String,
+    ): DeckProfile =
+        changeFolder(profile, at) {
+            if (it.actions.size >= LayoutLimits.MAX_FOLDER_ACTIONS) it else it.copy(actions = it.actions + actionId)
+        }
+
+    fun replaceInFolder(
+        profile: DeckProfile,
+        at: SlotPosition,
+        index: Int,
+        actionId: String,
+    ): DeckProfile =
+        changeFolder(profile, at) {
+            if (index !in
+                it.actions.indices
+            ) {
+                it
+            } else {
+                it.copy(actions = it.actions.toMutableList().also { l -> l[index] = actionId })
+            }
+        }
+
+    fun removeFromFolder(
+        profile: DeckProfile,
+        at: SlotPosition,
+        index: Int,
+    ): DeckProfile =
+        changeFolder(profile, at) {
+            if (index !in it.actions.indices) it else it.copy(actions = it.actions.filterIndexed { i, _ -> i != index })
+        }
+
+    /** Moves the button at [from] to position [to] inside the folder; the others shift. */
+    fun moveInFolder(
+        profile: DeckProfile,
+        at: SlotPosition,
+        from: Int,
+        to: Int,
+    ): DeckProfile =
+        changeFolder(profile, at) {
+            if (from == to || from !in it.actions.indices || to !in it.actions.indices) {
+                it
+            } else {
+                it.copy(actions = it.actions.toMutableList().also { l -> l.add(to, l.removeAt(from)) })
+            }
+        }
+
+    /**
+     * Takes a button out of the folder and puts it into the first empty cell of the folder's own page, else of any
+     * other page. Nothing happens when no cell is free: no button is ever lost.
+     */
+    fun moveOutOfFolder(
+        profile: DeckProfile,
+        at: SlotPosition,
+        index: Int,
+    ): DeckProfile {
+        val folder = profile.slotAt(at) as? DeckSlot.Folder ?: return profile
+        val actionId = folder.actions.getOrNull(index) ?: return profile
+        val order = listOf(at.page) + profile.pages.indices.filter { it != at.page }
+        val page = order.firstOrNull { profile.pages[it].slots.contains(null) } ?: return profile
+        val cell = SlotPosition(page, profile.pages[page].slots.indexOf(null))
+        return setSlot(removeFromFolder(profile, at, index), cell, DeckSlot.Action(actionId))
+    }
+
+    private fun changeFolder(
+        profile: DeckProfile,
+        at: SlotPosition,
+        change: (DeckSlot.Folder) -> DeckSlot.Folder,
+    ): DeckProfile {
+        val folder = profile.slotAt(at) as? DeckSlot.Folder ?: return profile
+        val changed = change(folder)
+        return if (changed == folder) profile else setSlot(profile, at, changed)
     }
 
     fun canAddPage(profile: DeckProfile): Boolean = profile.pages.size < LayoutLimits.MAX_PAGES

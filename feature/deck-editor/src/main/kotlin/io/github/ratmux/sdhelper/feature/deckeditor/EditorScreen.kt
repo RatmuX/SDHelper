@@ -1,6 +1,7 @@
 package io.github.ratmux.sdhelper.feature.deckeditor
 
 import android.os.SystemClock
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -69,7 +70,7 @@ private const val DWELL_POLL_MILLIS = 50L
 /** A button being dragged: where it came from and where the finger is, in the pager's pixel space. */
 private data class DragState(
     val from: SlotPosition,
-    val actionId: String,
+    val slot: DeckSlot,
     val pointer: Offset,
 )
 
@@ -89,6 +90,18 @@ private sealed interface Dialog {
 
     data object PageOptions : Dialog
 
+    data class NewFolder(
+        val at: SlotPosition,
+    ) : Dialog
+
+    data class RenameFolder(
+        val at: SlotPosition,
+    ) : Dialog
+
+    data class DeleteFolder(
+        val at: SlotPosition,
+    ) : Dialog
+
     data object Layouts : Dialog
 
     data object RenamePage : Dialog
@@ -99,9 +112,9 @@ private sealed interface Dialog {
 }
 
 /**
- * The editor of the active layout: landscape like the control panel, so what is edited is what is used. It opens
- * locked; "Edit mode" must be turned on before anything can change. In edit mode: tap a cell for its menu, or press
- * and hold a button and drag it to another cell (also on another page: hold it at the edge).
+ * The editor of the active layout: landscape like the control panel, so what is edited is what is used. Tap a cell
+ * for its menu, or press and hold a button and drag it to another cell (also on another page: hold it at the edge;
+ * dropped on a folder, a button goes into the folder).
  */
 @Composable
 fun EditorScreen(
@@ -124,6 +137,7 @@ private fun EditorBody(
 ) {
     val pager = rememberPagerState { profile.pages.size }
     var dialog by remember { mutableStateOf<Dialog?>(null) }
+    var openFolder by remember { mutableStateOf<SlotPosition?>(null) }
     var drag by remember { mutableStateOf<DragState?>(null) }
     var geometry by remember { mutableStateOf<GridGeometry?>(null) }
     var containerSize by remember { mutableStateOf(IntSize.Zero) }
@@ -181,8 +195,8 @@ private fun EditorBody(
                     position: Offset,
                 ) {
                     val from = SlotPosition(pager.currentPage, index)
-                    val slot = latestProfile.slotAt(from) as? DeckSlot.Action ?: return
-                    drag = DragState(from, slot.actionId, position)
+                    val slot = latestProfile.slotAt(from) ?: return
+                    drag = DragState(from, slot, position)
                 }
 
                 override fun onDrag(position: Offset) {
@@ -203,6 +217,24 @@ private fun EditorBody(
                 }
             }
         }
+
+    val openedFolder = openFolder?.let { latestProfile.slotAt(it) as? DeckSlot.Folder }
+    BackHandler(enabled = openedFolder != null) { openFolder = null }
+    if (openFolder != null && openedFolder == null) openFolder = null
+
+    if (openedFolder != null) {
+        Box(Modifier.fillMaxSize().safeDrawingPadding()) {
+            FolderEditor(
+                state,
+                profile,
+                checkNotNull(openFolder),
+                openedFolder,
+                viewModel,
+                onBack = { openFolder = null },
+            )
+        }
+        return
+    }
 
     Column(Modifier.fillMaxSize().safeDrawingPadding().padding(horizontal = 12.dp)) {
         Header(
@@ -238,19 +270,18 @@ private fun EditorBody(
                         } ==
                             true
                     when (val slot = profile.pages[pageIndex].slots[index]) {
-                        is DeckSlot.Action -> {
-                            val button = state.buttons[slot.actionId]
-                            DeckButtonTile(
-                                title = button?.title ?: slot.actionId,
-                                modifier = cell,
-                                iconKey = button?.iconKey,
+                        null -> {
+                            DeckEmptyTile(modifier = cell, highlighted = hovered)
+                        }
+
+                        else -> {
+                            SlotTile(
+                                slot,
+                                state,
+                                cell,
                                 enabled = drag?.from != position,
                                 highlighted = hovered,
                             )
-                        }
-
-                        null -> {
-                            DeckEmptyTile(modifier = cell, highlighted = hovered)
                         }
                     }
                 }
@@ -258,24 +289,20 @@ private fun EditorBody(
             drag?.let { d ->
                 val g = geometry
                 if (g != null) {
-                    val button = state.buttons[d.actionId]
                     val tile = with(LocalDensity.current) { g.tile.toDp() }
-                    DeckButtonTile(
-                        title = button?.title ?: d.actionId,
-                        modifier =
-                            Modifier
-                                .zIndex(1f)
-                                .offset {
-                                    androidx.compose.ui.unit.IntOffset(
-                                        (d.pointer.x - g.tile / 2).roundToInt(),
-                                        (
-                                            d.pointer.y -
-                                                g.tile / 2
-                                        ).roundToInt(),
-                                    )
-                                }.size(tile)
-                                .alpha(0.92f),
-                        iconKey = button?.iconKey,
+                    SlotTile(
+                        d.slot,
+                        state,
+                        Modifier
+                            .zIndex(1f)
+                            .offset {
+                                androidx.compose.ui.unit.IntOffset(
+                                    (d.pointer.x - g.tile / 2).roundToInt(),
+                                    (d.pointer.y - g.tile / 2).roundToInt(),
+                                )
+                            }.size(tile)
+                            .alpha(0.92f),
+                        enabled = true,
                         highlighted = true,
                     )
                 }
@@ -283,7 +310,7 @@ private fun EditorBody(
         }
     }
 
-    Dialogs(state, profile, pager, dialog, onDialog = { dialog = it }, viewModel)
+    Dialogs(state, profile, pager, dialog, onDialog = { dialog = it }, onOpenFolder = { openFolder = it }, viewModel)
 }
 
 @Composable
@@ -317,6 +344,14 @@ private fun Header(
 
                             EditorMessage.PAGE_FULL -> {
                                 stringResource(R.string.editor_message_page_full)
+                            }
+
+                            EditorMessage.FOLDER_FULL -> {
+                                stringResource(R.string.editor_message_folder_full)
+                            }
+
+                            EditorMessage.NO_FREE_CELL -> {
+                                stringResource(R.string.editor_message_no_free_cell)
                             }
 
                             EditorMessage.PAGE_LIMIT -> {
@@ -358,6 +393,7 @@ private fun Dialogs(
     pager: PagerState,
     dialog: Dialog?,
     onDialog: (Dialog?) -> Unit,
+    onOpenFolder: (SlotPosition) -> Unit,
     viewModel: EditorViewModel,
 ) {
     val close = { onDialog(null) }
@@ -376,35 +412,138 @@ private fun Dialogs(
         }
 
         is Dialog.Cell -> {
-            val filled = profile.slotAt(dialog.at) != null
+            val slot = profile.slotAt(dialog.at)
+            val full = Modifier.fillMaxWidth()
             DeckModal(
                 stringResource(R.string.editor_cell_title),
                 onDismiss = close,
                 dismissText = stringResource(R.string.editor_close),
             ) {
-                DeckListItem(
-                    title = stringResource(R.string.editor_cell_choose),
-                    onClick = { onDialog(Dialog.Picker(dialog.at)) },
-                    modifier = Modifier.fillMaxWidth(),
-                )
-                if (filled) {
+                when (slot) {
+                    is DeckSlot.Folder -> {
+                        DeckListItem(
+                            title = stringResource(R.string.editor_cell_open_folder),
+                            onClick = {
+                                onOpenFolder(dialog.at)
+                                close()
+                            },
+                            modifier = full,
+                        )
+                        DeckListItem(
+                            title = stringResource(R.string.editor_cell_rename_folder),
+                            onClick = { onDialog(Dialog.RenameFolder(dialog.at)) },
+                            modifier = full,
+                        )
+                    }
+
+                    else -> {
+                        DeckListItem(
+                            title = stringResource(R.string.editor_cell_choose),
+                            onClick = { onDialog(Dialog.Picker(dialog.at)) },
+                            modifier = full,
+                        )
+                        if (slot == null) {
+                            DeckListItem(
+                                title = stringResource(R.string.editor_cell_make_folder),
+                                onClick = { onDialog(Dialog.NewFolder(dialog.at)) },
+                                modifier = full,
+                            )
+                        }
+                    }
+                }
+                if (slot != null) {
                     DeckListItem(
-                        title = stringResource(R.string.editor_cell_clear),
+                        title =
+                            stringResource(
+                                if (slot is DeckSlot.Folder) {
+                                    R.string.editor_cell_remove_folder
+                                } else {
+                                    R.string.editor_cell_clear
+                                },
+                            ),
                         onClick = {
-                            viewModel.clear(dialog.at)
-                            close()
+                            if (slot is DeckSlot.Folder) {
+                                onDialog(Dialog.DeleteFolder(dialog.at))
+                            } else {
+                                viewModel.clear(dialog.at)
+                                close()
+                            }
                         },
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = full,
                     )
                     if (profile.pages.size > 1) {
                         DeckListItem(
                             title = stringResource(R.string.editor_cell_move_to_page),
                             onClick = { onDialog(Dialog.MoveToPage(dialog.at)) },
-                            modifier = Modifier.fillMaxWidth(),
+                            modifier = full,
                         )
                     }
                 }
             }
+        }
+
+        is Dialog.NewFolder -> {
+            val defaultName = stringResource(R.string.editor_default_folder)
+            var name by remember { mutableStateOf(defaultName) }
+            DeckModal(
+                title = stringResource(R.string.editor_folder_name),
+                onDismiss = close,
+                confirmText = stringResource(R.string.editor_ok),
+                onConfirm = {
+                    viewModel.createFolder(dialog.at, name)
+                    onOpenFolder(dialog.at)
+                    close()
+                },
+                dismissText = stringResource(R.string.editor_cancel),
+            ) {
+                DeckTextField(
+                    name,
+                    { name = it.take(LayoutLimits.MAX_NAME_LENGTH) },
+                    stringResource(R.string.editor_folder_name),
+                    Modifier.fillMaxWidth(),
+                )
+            }
+        }
+
+        is Dialog.RenameFolder -> {
+            var name by remember { mutableStateOf((profile.slotAt(dialog.at) as? DeckSlot.Folder)?.name.orEmpty()) }
+            DeckModal(
+                title = stringResource(R.string.editor_folder_name),
+                onDismiss = close,
+                confirmText = stringResource(R.string.editor_ok),
+                onConfirm = {
+                    viewModel.renameFolder(dialog.at, name)
+                    close()
+                },
+                dismissText = stringResource(R.string.editor_cancel),
+            ) {
+                DeckTextField(
+                    name,
+                    { name = it.take(LayoutLimits.MAX_NAME_LENGTH) },
+                    stringResource(R.string.editor_folder_name),
+                    Modifier.fillMaxWidth(),
+                )
+            }
+        }
+
+        is Dialog.DeleteFolder -> {
+            val folder = profile.slotAt(dialog.at) as? DeckSlot.Folder
+            DeckDialog(
+                title = stringResource(R.string.editor_folder_delete_title),
+                text =
+                    stringResource(
+                        R.string.editor_folder_delete_message,
+                        folder?.name.orEmpty(),
+                        folder?.actions?.size ?: 0,
+                    ),
+                confirmText = stringResource(R.string.editor_delete_confirm),
+                onConfirm = {
+                    viewModel.clear(dialog.at)
+                    close()
+                },
+                onDismiss = close,
+                dismissText = stringResource(R.string.editor_cancel),
+            )
         }
 
         is Dialog.Picker -> {
@@ -581,3 +720,37 @@ private fun Dialogs(
         )
     }
 }
+
+@Composable
+private fun SlotTile(
+    slot: DeckSlot,
+    state: EditorUiState,
+    modifier: Modifier,
+    enabled: Boolean,
+    highlighted: Boolean,
+) {
+    when (slot) {
+        is DeckSlot.Action -> {
+            val button = state.buttons[slot.actionId]
+            DeckButtonTile(
+                title = button?.title ?: slot.actionId,
+                modifier = modifier,
+                iconKey = button?.iconKey,
+                enabled = enabled,
+                highlighted = highlighted,
+            )
+        }
+
+        is DeckSlot.Folder -> {
+            DeckButtonTile(
+                title = slot.name,
+                modifier = modifier,
+                iconKey = FOLDER_ICON,
+                enabled = enabled,
+                highlighted = highlighted,
+            )
+        }
+    }
+}
+
+private const val FOLDER_ICON = "folder"

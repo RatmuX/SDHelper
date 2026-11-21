@@ -172,4 +172,47 @@ class DataStoreProfileStoreTest {
             assertEquals(DeckProfile::class, loaded::class)
             assertEquals(DeckPage::class, loaded.pages[0]::class)
         }
+
+    @Test
+    fun `folders and their buttons survive a save and a reload`() =
+        runTest {
+            val base = profile("a")
+            val withFolder =
+                LayoutOps.addToFolder(
+                    LayoutOps.createFolder(base, SlotPosition(0, 7), "Games", id = "folder-1"),
+                    SlotPosition(0, 7),
+                    "builtin.media/next",
+                )
+            DataStoreProfileStore(dataStore).save(withFolder)
+
+            val loaded = newStore().profiles.first().single()
+            assertEquals(withFolder, loaded)
+            assertEquals(
+                DeckSlot.Folder("folder-1", "Games", listOf("builtin.media/next")),
+                loaded.slotAt(SlotPosition(0, 7)),
+            )
+        }
+
+    @Test
+    fun `damaged folders are repaired - blank ids, blank buttons, too many buttons, bad names`() {
+        val actions = (0 until 60).joinToString(",") { "\"a$it\"" } + ",\"\""
+        val text =
+            """{"version":1,"profiles":[{"id":"p","name":"P","columns":4,"rows":2,"pages":[{"id":"g","name":"G","slots":[
+                {"type":"folder","id":"f","name":"  ","actions":[$actions]},
+                {"type":"folder","id":"","name":"No id"},
+                {"type":"folder","id":"g2","name":"Games","actions":["x","","y"]}
+            ]}]}]}"""
+        val page =
+            DataStoreProfileStore
+                .read(text)
+                .single()
+                .pages
+                .single()
+
+        val first = page.slots[0] as DeckSlot.Folder
+        assertEquals("Folder", first.name)
+        assertEquals(36, first.actions.size)
+        assertNull(page.slots[1], "a folder without an id reads as an empty cell")
+        assertEquals(listOf("x", "y"), (page.slots[2] as DeckSlot.Folder).actions)
+    }
 }

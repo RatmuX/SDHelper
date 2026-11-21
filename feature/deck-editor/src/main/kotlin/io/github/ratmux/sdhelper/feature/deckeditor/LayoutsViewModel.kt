@@ -62,7 +62,7 @@ class LayoutsViewModel(
         }
     }
 
-    /** A ready-made layout in the phone's language, under [name] (the preset's own title if blank). It becomes active. */
+    /** A ready-made layout in the phone's language under [name] (its own title if blank); it becomes active. */
     fun addFromPreset(
         presetId: String,
         name: String,

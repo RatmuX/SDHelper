@@ -8,7 +8,7 @@
 | 2 (done) | Skeleton: Gradle, version catalog, convention plugins, CI, lint, architecture tests, "hello" Android app and agent start |
 | 3a, 3b (done) | Secure pairing and connection; deck channel, built-in actions (volume, speakers, microphone, media) on Windows through the native helper, DPAPI secrets, plain actions list on the phone. Verified on Windows 11 with a phone |
 | 3c | Vertical slice, last part: landscape button grid with state colors and icons, pages, profiles and ready-made layouts, editor with drag and drop, settings (**built; awaiting the owner's phone test**) |
-| 3d | Folders (a button that opens a grid of buttons); the layout model is already prepared for them |
+| 3d | Folders: a button that opens a grid of buttons, made and filled in the editor (**built; awaiting the owner's phone test**) |
 | 4 | Plugin system: manifest, out-of-process host, permission prompt, generated parameter UI, built-ins moved to plugins, one Python example plugin, developer guide |
 | 5 | Polish: Discord actions, state feedback everywhere, packaging (APK, Windows installer), Miuix flavor proof, README, screenshots, release process |
 

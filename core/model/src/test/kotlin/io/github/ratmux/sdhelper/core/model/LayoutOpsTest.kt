@@ -203,3 +203,130 @@ class LayoutOpsTest {
         assertEquals(0, same.movedButtons)
     }
 }
+
+class LayoutFolderOpsTest {
+    private val grid = GridSize(4, 2)
+    private val home = SlotPosition(0, 0)
+
+    private fun profile(pages: Int = 2) =
+        DeckProfile("pr", "Test", grid, List(pages) { DeckPage("pg$it", "Page $it", LayoutOps.emptySlots(grid)) })
+
+    private fun withFolder(vararg actions: String): DeckProfile {
+        var p = LayoutOps.createFolder(profile(), home, "Games", id = "f1")
+        actions.forEach { p = LayoutOps.addToFolder(p, home, it) }
+        return p
+    }
+
+    private fun DeckProfile.folder() = slotAt(home) as DeckSlot.Folder
+
+    @Test
+    fun `a folder can only be created in an empty cell and gets a clean name`() {
+        val p = LayoutOps.createFolder(profile(), home, "  Streaming  ", id = "f")
+        assertEquals(DeckSlot.Folder("f", "Streaming"), p.slotAt(home))
+        assertSame(p, LayoutOps.createFolder(p, home, "Other"), "occupied cell: unchanged")
+        assertEquals("Folder", LayoutOps.createFolder(profile(), home, "   ").folder().name)
+        val outside = profile()
+        assertSame(outside, LayoutOps.createFolder(outside, SlotPosition(5, 0), "x"))
+    }
+
+    @Test
+    fun `buttons are added, replaced, removed and reordered inside a folder`() {
+        var p = withFolder("a", "b", "c")
+        assertEquals(listOf("a", "b", "c"), p.folder().actions)
+        p = LayoutOps.replaceInFolder(p, home, 1, "x")
+        p = LayoutOps.removeFromFolder(p, home, 0)
+        assertEquals(listOf("x", "c"), p.folder().actions)
+        p = LayoutOps.moveInFolder(p, home, 0, 1)
+        assertEquals(listOf("c", "x"), p.folder().actions)
+        assertSame(p, LayoutOps.moveInFolder(p, home, 0, 9))
+        assertSame(p, LayoutOps.removeFromFolder(p, home, 9))
+        assertSame(p, LayoutOps.replaceInFolder(p, home, 9, "z"))
+    }
+
+    @Test
+    fun `operations on a cell that is not a folder change nothing`() {
+        val p = LayoutOps.setSlot(profile(), home, DeckSlot.Action("a"))
+        assertSame(p, LayoutOps.addToFolder(p, home, "b"))
+        assertSame(p, LayoutOps.renameFolder(p, home, "n"))
+        assertSame(p, LayoutOps.moveOutOfFolder(p, home, 0))
+    }
+
+    @Test
+    fun `a folder holds at most the limit`() {
+        var p = LayoutOps.createFolder(profile(), home, "Big", id = "f")
+        repeat(LayoutLimits.MAX_FOLDER_ACTIONS + 5) { p = LayoutOps.addToFolder(p, home, "a$it") }
+        assertEquals(LayoutLimits.MAX_FOLDER_ACTIONS, p.folder().actions.size)
+    }
+
+    @Test
+    fun `dropping a button on a folder puts it inside, a full folder refuses it`() {
+        var p = withFolder("a")
+        p = LayoutOps.setSlot(p, SlotPosition(0, 3), DeckSlot.Action("b"))
+        p = LayoutOps.move(p, SlotPosition(0, 3), home)
+        assertEquals(listOf("a", "b"), p.folder().actions)
+        assertNull(p.slotAt(SlotPosition(0, 3)))
+
+        var full = LayoutOps.createFolder(profile(), home, "Full", id = "f")
+        repeat(LayoutLimits.MAX_FOLDER_ACTIONS) { full = LayoutOps.addToFolder(full, home, "a$it") }
+        full = LayoutOps.setSlot(full, SlotPosition(0, 3), DeckSlot.Action("extra"))
+        assertSame(full, LayoutOps.move(full, SlotPosition(0, 3), home))
+    }
+
+    @Test
+    fun `a folder moves and swaps like any button`() {
+        val p = withFolder("a")
+        val moved = LayoutOps.move(p, home, SlotPosition(1, 5))
+        assertEquals("f1", (moved.slotAt(SlotPosition(1, 5)) as DeckSlot.Folder).id)
+        assertNull(moved.slotAt(home))
+    }
+
+    @Test
+    fun `taking a button out puts it into the first free cell, own page first`() {
+        var p = withFolder("a", "b")
+        p = LayoutOps.moveOutOfFolder(p, home, 0)
+        assertEquals(listOf("b"), p.folder().actions)
+        assertEquals(DeckSlot.Action("a"), p.slotAt(SlotPosition(0, 1)))
+
+        // own page full: another page takes it, and when no page has room nothing is lost
+        var crowded = withFolder("a")
+        for (page in 0..1) {
+            for (i in 0 until grid.capacity) {
+                if (crowded.slotAt(SlotPosition(page, i)) ==
+                    null
+                ) {
+                    crowded = LayoutOps.setSlot(crowded, SlotPosition(page, i), DeckSlot.Action("p$page$i"))
+                }
+            }
+        }
+        assertSame(crowded, LayoutOps.moveOutOfFolder(crowded, home, 0))
+        val room = LayoutOps.clear(crowded, SlotPosition(1, 2))
+        assertEquals(DeckSlot.Action("a"), LayoutOps.moveOutOfFolder(room, home, 0).slotAt(SlotPosition(1, 2)))
+    }
+
+    @Test
+    fun `resizing the grid keeps folders and their buttons`() {
+        val p = withFolder("a", "b", "c")
+        for (target in GridSize.ALLOWED) {
+            val result = LayoutOps.resizeGrid(p, target)
+            assertNotNull(result)
+            assertEquals(setOf("a", "b", "c"), result.profile.actionIds)
+        }
+    }
+
+    @Test
+    fun `folder pages follow the grid capacity and an empty folder has one empty page`() {
+        val folder = DeckSlot.Folder("f", "F", List(10) { "a$it" })
+        assertEquals(listOf(8, 2), folder.pages(8).map { it.size })
+        assertEquals(listOf(10), folder.pages(18).map { it.size })
+        assertEquals(listOf(emptyList()), DeckSlot.Folder("f", "F").pages(8))
+        assertEquals(listOf(emptyList()), folder.pages(0))
+    }
+
+    @Test
+    fun `the action ids of a layout include those inside folders`() {
+        var p = withFolder("a", "b")
+        p = LayoutOps.setSlot(p, SlotPosition(1, 0), DeckSlot.Action("c"))
+        assertEquals(setOf("a", "b", "c"), p.actionIds)
+        assertEquals(2, p.buttonCount, "the folder is one cell, the action another")
+    }
+}

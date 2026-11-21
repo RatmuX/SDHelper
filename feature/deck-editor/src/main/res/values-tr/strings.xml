@@ -53,4 +53,20 @@
     <string name="layouts_delete_confirm">Sil</string>
     <string name="layouts_last">En az bir düzen olmalı, bu yüzden son düzen silinemez.</string>
     <string name="layouts_default_name">Yeni düzen</string>
+    <string name="editor_cell_make_folder">Buraya klasör yap…</string>
+    <string name="editor_cell_open_folder">Klasörü aç</string>
+    <string name="editor_cell_rename_folder">Klasörü yeniden adlandır…</string>
+    <string name="editor_cell_remove_folder">Klasörü kaldır…</string>
+    <string name="editor_folder_name">Klasör adı</string>
+    <string name="editor_default_folder">Klasör</string>
+    <string name="editor_folder_hint">Tuş eklemek için boş bir hücreye dokun. Sırayı değiştirmek için bir tuşa basılı tutup sürükle.</string>
+    <string name="editor_folder_back">Geri</string>
+    <string name="editor_folder_rename">Adlandır</string>
+    <string name="editor_folder_delete_title">Klasör kaldırılsın mı?</string>
+    <string name="editor_folder_delete_message">\"%1$s\" klasörü ve içindeki %2$d tuş bu düzenden kaldırılacak.</string>
+    <string name="editor_folder_item_change">Başka eylem seç…</string>
+    <string name="editor_folder_item_remove">Klasörden kaldır</string>
+    <string name="editor_folder_item_out">Klasörden çıkar</string>
+    <string name="editor_message_folder_full">Klasör dolu.</string>
+    <string name="editor_message_no_free_cell">Taşınacak boş hücre yok.</string>
 </resources>

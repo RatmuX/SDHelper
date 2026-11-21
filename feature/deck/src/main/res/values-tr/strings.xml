@@ -7,4 +7,5 @@
     <string name="deck_not_connected">Bağlı değil</string>
     <string name="deck_message_not_connected">Bağlantı koptu.</string>
     <string name="deck_message_refused">Bilgisayar bunu yapamadı: %1$s</string>
+    <string name="deck_back">Geri</string>
 </resources>

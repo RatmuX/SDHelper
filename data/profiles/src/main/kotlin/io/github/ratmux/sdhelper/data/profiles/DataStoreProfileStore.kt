@@ -31,6 +31,10 @@ class DataStoreProfileStore(
     internal data class StoredSlot(
         val type: String = TYPE_ACTION,
         val actionId: String? = null,
+        /** Folders only. */
+        val id: String? = null,
+        val name: String? = null,
+        val actions: List<String> = emptyList(),
     )
 
     @Serializable
@@ -115,8 +119,22 @@ class DataStoreProfileStore(
                                         page.name,
                                         page.slots.map { slot ->
                                             when (slot) {
-                                                is DeckSlot.Action -> StoredSlot(TYPE_ACTION, slot.actionId)
-                                                null -> null
+                                                is DeckSlot.Action -> {
+                                                    StoredSlot(TYPE_ACTION, slot.actionId)
+                                                }
+
+                                                is DeckSlot.Folder -> {
+                                                    StoredSlot(
+                                                        type = TYPE_FOLDER,
+                                                        id = slot.id,
+                                                        name = slot.name,
+                                                        actions = slot.actions,
+                                                    )
+                                                }
+
+                                                null -> {
+                                                    null
+                                                }
                                             }
                                         },
                                     )
@@ -129,6 +147,7 @@ class DataStoreProfileStore(
     companion object {
         internal const val VERSION = 1
         internal const val TYPE_ACTION = "action"
+        internal const val TYPE_FOLDER = "folder"
         private val PROFILES = stringPreferencesKey("profiles_json")
         private val ACTIVE = stringPreferencesKey("active_profile")
 
@@ -152,6 +171,30 @@ class DataStoreProfileStore(
             return document.profiles.mapNotNull { runCatching { repair(it) }.getOrNull() }
         }
 
+        private fun repairSlot(slot: StoredSlot?): DeckSlot? =
+            when {
+                slot == null -> {
+                    null
+                }
+
+                slot.type == TYPE_ACTION && !slot.actionId.isNullOrBlank() -> {
+                    DeckSlot.Action(slot.actionId)
+                }
+
+                slot.type == TYPE_FOLDER && !slot.id.isNullOrBlank() -> {
+                    DeckSlot.Folder(
+                        id = slot.id,
+                        name = LayoutOps.cleanName(slot.name.orEmpty()) ?: "Folder",
+                        actions = slot.actions.filter { it.isNotBlank() }.take(LayoutLimits.MAX_FOLDER_ACTIONS),
+                    )
+                }
+
+                // unknown types (from a newer app version) read as empty cells
+                else -> {
+                    null
+                }
+            }
+
         private fun repair(stored: StoredProfile): DeckProfile {
             val grid = GridSize(stored.columns, stored.rows).takeIf { it in GridSize.ALLOWED } ?: GridSize.DEFAULT
             val pages =
@@ -159,16 +202,7 @@ class DataStoreProfileStore(
                     .take(LayoutLimits.MAX_PAGES)
                     .map { page ->
                         val slots =
-                            List(grid.capacity) { index ->
-                                val slot = page.slots.getOrNull(index)
-                                if (slot?.type == TYPE_ACTION &&
-                                    !slot.actionId.isNullOrBlank()
-                                ) {
-                                    DeckSlot.Action(slot.actionId)
-                                } else {
-                                    null
-                                }
-                            }
+                            List(grid.capacity) { index -> repairSlot(page.slots.getOrNull(index)) }
                         DeckPage(page.id, LayoutOps.cleanName(page.name) ?: "Page", slots)
                     }.ifEmpty { listOf(DeckPage("page-1", "Page 1", LayoutOps.emptySlots(grid))) }
             return DeckProfile(stored.id, LayoutOps.cleanName(stored.name) ?: "Layout", grid, pages)
