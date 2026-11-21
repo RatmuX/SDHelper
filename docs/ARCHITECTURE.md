@@ -85,8 +85,7 @@ Adding Linux means a new `agent:platform-linux` module (and `native/linux/` if n
 
 ## 5. Surfaces (future-proofing)
 
-The home menu lists registered surfaces: `Surface(id, titleRes, icon, route, requiredCapabilities)`.
-v1 registers Deck and Deck Editor. Keyboard (v2) and touchpad (v3) are added as a new `feature:*` module plus one registration line, a protocol channel (`input.keyboard`, `input.pointer`) and a matching handler registered on the agent. Existing modules are not edited.
+The home screen is a frame with a navigation drawer that lists the app's modes (`AppMode`): Stream Deck today, Keyboard (v2) and Touch Pad (v3) shown as "coming soon" until they exist. The last mode used is restored on the next start. A new mode is a new `feature:*` module, one `AppMode` entry, a protocol channel (`input.keyboard`, `input.pointer`) and a matching handler registered on the agent; existing modules are not edited.
 
 ## 6. Actions
 

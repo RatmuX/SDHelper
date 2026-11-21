@@ -1,6 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="settings_title">Ayarlar</string>
-    <string name="settings_haptic">Tuşa basınca titret</string>
-    <string name="settings_keep_screen_on">Kontrol panelinde ekranı açık tut</string>
+    <string name="settings_coming_soon">Yakında</string>
+    <string name="settings_stream_deck">Stream Deck</string>
+    <string name="settings_stream_deck_summary">Tuşlar ve hazır ayarlar</string>
+    <string name="settings_touch_pad">Touch Pad</string>
+    <string name="settings_touch_pad_summary">İmleç ve hareketler</string>
+    <string name="settings_keyboard">Keyboard</string>
+    <string name="settings_keyboard_summary">Klavye kısayolları</string>
+    <string name="settings_general">Genel</string>
+    <string name="settings_general_summary">Tasarım ve tema</string>
+    <string name="general_design">Tasarım</string>
+    <string name="general_design_summary">Uygulamanın görünümü</string>
+    <string name="design_material">Material You 3</string>
+    <string name="design_material_summary">Kişisel, adaptif görünüm</string>
+    <string name="design_miuix">MIUIX</string>
+    <string name="design_miuix_summary">HyperOS esintili görünüm</string>
+    <string name="general_theme">Tema</string>
+    <string name="general_theme_summary">Uygulama renk düzeni</string>
+    <string name="theme_light">Açık</string>
+    <string name="theme_dark">Koyu</string>
+    <string name="deck_haptic">Titreşim</string>
+    <string name="deck_haptic_summary">Tuşa basınca titret</string>
+    <string name="deck_keep_screen_on">Ekranı açık tut</string>
+    <string name="deck_keep_screen_on_summary">Panel açıkken ekran kapanmasın</string>
+    <string name="deck_layouts">Hazır ayarlar</string>
+    <string name="deck_layout_summary">%1$d sayfa, %2$d × %3$d</string>
+    <string name="deck_use">Bu düzeni kullan</string>
+    <string name="deck_rename">Yeniden adlandır…</string>
+    <string name="deck_copy">Kopyasını oluştur</string>
+    <string name="deck_delete">Sil…</string>
+    <string name="deck_name">Ad</string>
+    <string name="deck_delete_title">Düzen silinsin mi?</string>
+    <string name="deck_delete_message">\"%1$s\" düzeni ve tüm sayfaları kaldırılacak.</string>
+    <string name="deck_delete_confirm">Sil</string>
+    <string name="deck_last_layout">En az bir düzen olmalı, bu yüzden son düzen silinemez.</string>
+    <string name="settings_ok">Tamam</string>
+    <string name="settings_cancel">Vazgeç</string>
+    <string name="settings_close">Kapat</string>
 </resources>

@@ -1,12 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="home_title">SDHelper</string>
-    <string name="surface_deck_title">Control Panel</string>
-    <string name="surface_deck_subtitle">Use your shortcut buttons</string>
-    <string name="surface_editor_title">Edit Shortcuts</string>
-    <string name="surface_editor_subtitle">Arrange buttons and pages with drag and drop</string>
-    <string name="surface_connection_title">Computers</string>
-    <string name="surface_connection_subtitle">Pair and connect to your computers</string>
-    <string name="surface_settings_title">Settings</string>
-    <string name="surface_settings_subtitle">Vibration and screen options</string>
+    <string name="home_brand">Computer Helper</string>
+    <string name="home_connect_computer">Connect a computer</string>
+    <string name="home_controls">CONTROLS</string>
+    <string name="home_settings">Settings</string>
+    <string name="home_coming_soon">Coming soon</string>
+    <string name="mode_stream_deck">Stream Deck</string>
+    <string name="mode_touch_pad">Touch Pad</string>
+    <string name="mode_keyboard">Keyboard</string>
+    <string name="home_eyebrow">COMPUTER HELPER</string>
+    <string name="home_headline">Control center</string>
+    <string name="home_supporting">Manage the shortcuts on your computer from this device.</string>
+    <string name="home_start_title">Start Stream Deck</string>
+    <string name="home_start_copy">Open the shortcut panel and use the active layout.</string>
+    <string name="home_start_action">START</string>
+    <string name="home_edit_title">Set up Stream Deck</string>
+    <string name="home_edit_copy">Arrange the buttons, shortcuts and layouts.</string>
+    <string name="home_edit_action">SET UP</string>
 </resources>

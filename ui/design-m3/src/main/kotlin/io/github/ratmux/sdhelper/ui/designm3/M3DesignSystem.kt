@@ -22,19 +22,18 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -102,28 +101,6 @@ object M3DesignSystem : DesignSystem {
     }
 
     @Composable
-    override fun Card(
-        title: String,
-        subtitle: String?,
-        onClick: () -> Unit,
-        modifier: Modifier,
-    ) {
-        Card(
-            onClick = onClick,
-            modifier = modifier,
-            shape = MaterialTheme.shapes.large,
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow),
-        ) {
-            Column(Modifier.padding(16.dp)) {
-                Text(title, style = MaterialTheme.typography.titleMedium)
-                if (subtitle != null) {
-                    Text(subtitle, style = MaterialTheme.typography.bodyMedium)
-                }
-            }
-        }
-    }
-
-    @Composable
     override fun Button(
         text: String,
         onClick: () -> Unit,
@@ -131,17 +108,14 @@ object M3DesignSystem : DesignSystem {
         enabled: Boolean,
         emphasis: DeckEmphasis,
     ) {
+        // the design has pills in the secondary container and plain text actions, no filled or outlined buttons
         when (emphasis) {
             DeckEmphasis.PRIMARY -> {
-                Button(onClick = onClick, modifier = modifier, enabled = enabled) { Text(text) }
+                FilledTonalButton(onClick = onClick, modifier = modifier, enabled = enabled) { Text(text) }
             }
 
             DeckEmphasis.SECONDARY -> {
-                OutlinedButton(
-                    onClick = onClick,
-                    modifier = modifier,
-                    enabled = enabled,
-                ) { Text(text) }
+                TextButton(onClick = onClick, modifier = modifier, enabled = enabled) { Text(text) }
             }
         }
     }
@@ -242,10 +216,12 @@ object M3DesignSystem : DesignSystem {
                 DeckTextStyle.EYEBROW -> MaterialTheme.typography.labelLarge
                 DeckTextStyle.HEADLINE -> MaterialTheme.typography.headlineSmall
                 DeckTextStyle.SUPPORTING -> MaterialTheme.typography.bodyLarge
+                DeckTextStyle.SECTION -> MaterialTheme.typography.labelLarge
             }
         val color =
             when (style) {
                 DeckTextStyle.EYEBROW, DeckTextStyle.SUPPORTING -> MaterialTheme.colorScheme.onSurfaceVariant
+                DeckTextStyle.SECTION -> MaterialTheme.colorScheme.primary
                 else -> Color.Unspecified
             }
         Text(text = text, style = textStyle, color = color, modifier = modifier)
@@ -504,25 +480,6 @@ object M3DesignSystem : DesignSystem {
 
     @Composable
     override fun PopupHeading(text: String) = M3PopupHeading(text)
-
-    @Composable
-    override fun SwitchRow(
-        label: String,
-        checked: Boolean,
-        onCheckedChange: (Boolean) -> Unit,
-        modifier: Modifier,
-    ) {
-        Row(
-            modifier =
-                modifier
-                    .toggleable(value = checked, role = Role.Switch, onValueChange = onCheckedChange)
-                    .padding(vertical = ROW_PADDING),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Text(label, style = MaterialTheme.typography.bodyLarge, modifier = Modifier.weight(1f))
-            Switch(checked = checked, onCheckedChange = null)
-        }
-    }
 
     @Composable
     override fun Modal(

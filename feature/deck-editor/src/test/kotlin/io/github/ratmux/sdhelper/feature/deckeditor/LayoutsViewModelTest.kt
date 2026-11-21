@@ -241,4 +241,21 @@ class LayoutsViewModelTest {
                     .name,
             )
         }
+
+    @Test
+    fun `saving a copy keeps the edited layout active and names the copy`() =
+        runTest {
+            val vm = viewModel()
+            vm.saveCopy(everyday.id, "  Evening ")
+
+            assertEquals(listOf("Everyday", "Evening"), profiles.list.value.map { it.name })
+            assertEquals(everyday.id, profiles.active.value)
+            assertEquals(
+                everyday.pages.map { it.slots },
+                profiles.list.value
+                    .last()
+                    .pages
+                    .map { it.slots },
+            )
+        }
 }

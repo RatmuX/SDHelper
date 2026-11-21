@@ -117,7 +117,14 @@ enum class ThemeMode {
 }
 
 /** The modes of the app, shown in the navigation drawer. Only the Stream Deck exists so far. */
-enum class AppMode { STREAM_DECK, TOUCH_PAD, KEYBOARD }
+enum class AppMode(
+    /** False for a mode that is announced but not built yet; it is shown as "coming soon" and cannot be opened. */
+    val available: Boolean,
+) {
+    STREAM_DECK(available = true),
+    TOUCH_PAD(available = false),
+    KEYBOARD(available = false),
+}
 
 /** Phone-wide preferences. */
 data class AppSettings(

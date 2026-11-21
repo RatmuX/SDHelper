@@ -54,7 +54,12 @@ fun AddComputerScreen(
 
     DeckScaffold(title = stringResource(R.string.add_title), modifier = modifier, onBack = onBack) { padding ->
         Column(
-            modifier = Modifier.padding(padding).padding(16.dp).verticalScroll(rememberScrollState()),
+            modifier =
+                Modifier
+                    .padding(
+                        padding,
+                    ).padding(start = 20.dp, end = 20.dp, top = 12.dp, bottom = 24.dp)
+                    .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             if (!state.localNetworkGranted) {
@@ -86,7 +91,11 @@ fun AddComputerScreen(
                 enabled = state.localNetworkGranted && !state.busy,
             )
 
-            DeckText(stringResource(R.string.add_manual), style = DeckTextStyle.TITLE)
+            DeckText(
+                stringResource(R.string.add_manual),
+                style = DeckTextStyle.SECTION,
+                modifier = Modifier.padding(start = 16.dp, top = 8.dp),
+            )
             DeckTextField(
                 value = state.host,
                 onValueChange = viewModel::onHostChange,

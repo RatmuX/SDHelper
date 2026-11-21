@@ -7,14 +7,14 @@ import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
-import io.github.ratmux.sdhelper.core.model.SurfaceIds
 import io.github.ratmux.sdhelper.feature.connection.AddComputerScreen
 import io.github.ratmux.sdhelper.feature.connection.ComputersScreen
 import io.github.ratmux.sdhelper.feature.deck.DeckScreen
 import io.github.ratmux.sdhelper.feature.deckeditor.EditorScreen
 import io.github.ratmux.sdhelper.feature.home.HomeScreen
-import io.github.ratmux.sdhelper.feature.home.defaultSurfaceEntries
-import io.github.ratmux.sdhelper.feature.settings.SettingsScreen
+import io.github.ratmux.sdhelper.feature.settings.GeneralSettingsScreen
+import io.github.ratmux.sdhelper.feature.settings.SettingsHomeScreen
+import io.github.ratmux.sdhelper.feature.settings.StreamDeckSettingsScreen
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -31,6 +31,12 @@ data object EditorRoute : NavKey
 
 @Serializable
 data object SettingsRoute : NavKey
+
+@Serializable
+data object StreamDeckSettingsRoute : NavKey
+
+@Serializable
+data object GeneralSettingsRoute : NavKey
 
 @Serializable
 data class AddComputerRoute(
@@ -56,22 +62,25 @@ fun AppNavigation() {
             entryProvider {
                 entry<HomeRoute> {
                     HomeScreen(
-                        entries = defaultSurfaceEntries(),
-                        onOpen = { surface ->
-                            when (surface.id) {
-                                SurfaceIds.DECK -> backStack.add(DeckRoute)
-                                SurfaceIds.DECK_EDITOR -> backStack.add(EditorRoute)
-                                SurfaceIds.CONNECTION -> backStack.add(ComputersRoute)
-                                SurfaceIds.SETTINGS -> backStack.add(SettingsRoute)
-                            }
-                        },
+                        onStartDeck = { backStack.add(DeckRoute) },
+                        onEditDeck = { backStack.add(EditorRoute) },
+                        onOpenComputers = { backStack.add(ComputersRoute) },
+                        onOpenSettings = { backStack.add(SettingsRoute) },
                     )
                 }
                 entry<DeckRoute> {
                     DeckScreen(onOpenComputers = { backStack.add(ComputersRoute) })
                 }
                 entry<EditorRoute> { EditorScreen() }
-                entry<SettingsRoute> { SettingsScreen(onBack = back) }
+                entry<SettingsRoute> {
+                    SettingsHomeScreen(
+                        onBack = back,
+                        onOpenStreamDeck = { backStack.add(StreamDeckSettingsRoute) },
+                        onOpenGeneral = { backStack.add(GeneralSettingsRoute) },
+                    )
+                }
+                entry<StreamDeckSettingsRoute> { StreamDeckSettingsScreen(onBack = back) }
+                entry<GeneralSettingsRoute> { GeneralSettingsScreen(onBack = back) }
                 entry<ComputersRoute> {
                     ComputersScreen(
                         onBack = back,

@@ -1,6 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="settings_title">Settings</string>
-    <string name="settings_haptic">Vibrate on button press</string>
-    <string name="settings_keep_screen_on">Keep the screen on in the control panel</string>
+    <string name="settings_coming_soon">Coming soon</string>
+    <string name="settings_stream_deck">Stream Deck</string>
+    <string name="settings_stream_deck_summary">Buttons and ready-made settings</string>
+    <string name="settings_touch_pad">Touch Pad</string>
+    <string name="settings_touch_pad_summary">Pointer and gestures</string>
+    <string name="settings_keyboard">Keyboard</string>
+    <string name="settings_keyboard_summary">Keyboard shortcuts</string>
+    <string name="settings_general">General</string>
+    <string name="settings_general_summary">Design and theme</string>
+    <string name="general_design">Design</string>
+    <string name="general_design_summary">How the app looks</string>
+    <string name="design_material">Material You 3</string>
+    <string name="design_material_summary">Personal, adaptive look</string>
+    <string name="design_miuix">MIUIX</string>
+    <string name="design_miuix_summary">HyperOS-inspired look</string>
+    <string name="general_theme">Theme</string>
+    <string name="general_theme_summary">The app\'s color scheme</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_dark">Dark</string>
+    <string name="deck_haptic">Vibration</string>
+    <string name="deck_haptic_summary">Vibrate when a button is pressed</string>
+    <string name="deck_keep_screen_on">Keep screen on</string>
+    <string name="deck_keep_screen_on_summary">The screen stays on while the panel is open</string>
+    <string name="deck_layouts">Ready-made settings</string>
+    <string name="deck_layout_summary">%1$d pages, %2$d × %3$d</string>
+    <string name="deck_use">Use this layout</string>
+    <string name="deck_rename">Rename…</string>
+    <string name="deck_copy">Make a copy</string>
+    <string name="deck_delete">Delete…</string>
+    <string name="deck_name">Name</string>
+    <string name="deck_delete_title">Delete layout?</string>
+    <string name="deck_delete_message">The layout \"%1$s\" and all its pages will be removed.</string>
+    <string name="deck_delete_confirm">Delete</string>
+    <string name="deck_last_layout">There must be at least one layout, so the last one cannot be deleted.</string>
+    <string name="settings_ok">OK</string>
+    <string name="settings_cancel">Cancel</string>
+    <string name="settings_close">Close</string>
 </resources>

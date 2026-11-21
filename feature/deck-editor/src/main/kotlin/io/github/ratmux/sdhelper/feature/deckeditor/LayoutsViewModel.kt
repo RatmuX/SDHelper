@@ -7,6 +7,7 @@ import io.github.ratmux.sdhelper.core.model.DeckProfile
 import io.github.ratmux.sdhelper.core.model.GridSize
 import io.github.ratmux.sdhelper.core.model.LayoutIds
 import io.github.ratmux.sdhelper.core.model.LayoutLimits
+import io.github.ratmux.sdhelper.core.model.LayoutManager
 import io.github.ratmux.sdhelper.core.model.LayoutOps
 import io.github.ratmux.sdhelper.core.model.LayoutPresets
 import io.github.ratmux.sdhelper.core.model.ProfileStore
@@ -40,6 +41,7 @@ class LayoutsViewModel(
     private val newId: () -> String = LayoutIds::random,
     private val newLayoutName: () -> String = { "New layout" },
 ) : ViewModel() {
+    private val manager = LayoutManager(profiles, newId)
     private val message = MutableStateFlow<LayoutsMessage?>(null)
 
     val state: StateFlow<LayoutsUiState> =
@@ -48,88 +50,49 @@ class LayoutsViewModel(
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MILLIS), LayoutsUiState())
 
     fun activate(profileId: String) {
-        viewModelScope.launch { profiles.setActive(profileId) }
+        viewModelScope.launch { manager.activate(profileId) }
     }
 
     /** An empty layout with one page; the person fills it in the editor. It becomes the active layout. */
     fun createEmpty(name: String) {
-        viewModelScope.launch {
-            val grid = GridSize.DEFAULT
-            val page = DeckPage(newId(), defaultPageName(1), LayoutOps.emptySlots(grid))
-            val created = DeckProfile(newId(), chosenName(name, fallback = newLayoutName()), grid, listOf(page))
-            profiles.save(created.copy(name = uniqueName(created.name)))
-            profiles.setActive(created.id)
-        }
+        viewModelScope.launch { manager.createEmpty(name, newLayoutName(), defaultPageName(1)) }
     }
 
-    /** A ready-made layout in the phone's language, under [name] (the preset's own title if blank). It becomes active. */
+    /** A ready-made layout in the phone's language under [name] (its own title if blank); it becomes active. */
     fun addFromPreset(
         presetId: String,
         name: String,
     ) {
-        val preset = LayoutPresets.byId(presetId) ?: return
-        viewModelScope.launch {
-            val created = preset.create(language(), newId = newId)
-            val named = created.copy(name = uniqueName(chosenName(name, fallback = created.name)))
-            profiles.save(named)
-            profiles.setActive(named.id)
-        }
+        viewModelScope.launch { manager.addFromPreset(presetId, name, language()) }
+    }
+
+    /** "Save": a copy of the layout under [name]; the active layout stays the one being edited. */
+    fun saveCopy(
+        profileId: String,
+        name: String,
+    ) {
+        viewModelScope.launch { manager.saveCopy(profileId, name) }
     }
 
     fun duplicate(profileId: String) {
-        viewModelScope.launch {
-            val original = profiles.profiles.first().firstOrNull { it.id == profileId } ?: return@launch
-            profiles.save(
-                original.copy(
-                    id = newId(),
-                    name = uniqueName(original.name),
-                    pages = original.pages.map { it.copy(id = newId()) },
-                ),
-            )
-        }
+        viewModelScope.launch { manager.saveCopy(profileId, "") }
     }
 
     fun rename(
         profileId: String,
         name: String,
     ) {
-        viewModelScope.launch {
-            val original = profiles.profiles.first().firstOrNull { it.id == profileId } ?: return@launch
-            val renamed = LayoutOps.renameProfile(original, name)
-            if (renamed != original) profiles.save(renamed)
-        }
+        viewModelScope.launch { manager.rename(profileId, name) }
     }
 
     fun delete(profileId: String) {
         viewModelScope.launch {
-            if (!profiles.delete(profileId)) message.value = LayoutsMessage.LAST_LAYOUT_CANNOT_BE_DELETED
+            if (!manager.delete(profileId)) message.value = LayoutsMessage.LAST_LAYOUT_CANNOT_BE_DELETED
         }
     }
 
     fun dismissMessage() {
         message.value = null
-    }
-
-    private fun chosenName(
-        raw: String,
-        fallback: String,
-    ): String = LayoutOps.cleanName(raw) ?: fallback
-
-    /** `Gaming`, then `Gaming (2)`, `Gaming (3)`, ... and always within the name length limit. */
-    private suspend fun uniqueName(base: String): String {
-        val taken =
-            profiles.profiles
-                .first()
-                .map { it.name }
-                .toSet()
-        if (base !in taken) return base
-        var number = 2
-        while (true) {
-            val suffix = " ($number)"
-            val candidate = base.take(LayoutLimits.MAX_NAME_LENGTH - suffix.length) + suffix
-            if (candidate !in taken) return candidate
-            number++
-        }
     }
 
     private companion object {

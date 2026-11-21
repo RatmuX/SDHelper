@@ -1,12 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="home_title">SDHelper</string>
-    <string name="surface_deck_title">Kontrol Paneli</string>
-    <string name="surface_deck_subtitle">Kısayol tuşlarını kullan</string>
-    <string name="surface_editor_title">Kısayolları Düzenle</string>
-    <string name="surface_editor_subtitle">Tuşları ve sayfaları sürükle-bırak ile düzenle</string>
-    <string name="surface_connection_title">Bilgisayarlar</string>
-    <string name="surface_connection_subtitle">Bilgisayarlarını eşleştir ve bağlan</string>
-    <string name="surface_settings_title">Ayarlar</string>
-    <string name="surface_settings_subtitle">Titreşim ve ekran seçenekleri</string>
+    <string name="home_brand">Bilgisayar Yardımcısı</string>
+    <string name="home_connect_computer">Bilgisayar bağla</string>
+    <string name="home_controls">KONTROLLER</string>
+    <string name="home_settings">Ayarlar</string>
+    <string name="home_coming_soon">Yakında</string>
+    <string name="mode_stream_deck">Stream Deck</string>
+    <string name="mode_touch_pad">Touch Pad</string>
+    <string name="mode_keyboard">Keyboard</string>
+    <string name="home_eyebrow">BİLGİSAYAR YARDIMCISI</string>
+    <string name="home_headline">Kontrol merkezi</string>
+    <string name="home_supporting">Bilgisayarındaki kısayolları bu cihazdan yönet.</string>
+    <string name="home_start_title">Stream Deck’i başlat</string>
+    <string name="home_start_copy">Kısayol panelini aç ve etkin profili kullan.</string>
+    <string name="home_start_action">BAŞLAT</string>
+    <string name="home_edit_title">Stream Deck’i ayarla</string>
+    <string name="home_edit_copy">Tuş düzenini, kısayolları ve profilleri düzenle.</string>
+    <string name="home_edit_action">AYARLA</string>
 </resources>

@@ -15,7 +15,7 @@ enum class DeckEmphasis { PRIMARY, SECONDARY }
 enum class DeckTileTone { NORMAL, ACTIVE, WARNING, ALERT }
 
 /** Typographic role of a piece of text. */
-enum class DeckTextStyle { TITLE, BODY, CAPTION, EYEBROW, HEADLINE, SUPPORTING }
+enum class DeckTextStyle { TITLE, BODY, CAPTION, EYEBROW, HEADLINE, SUPPORTING, SECTION }
 
 /** What sits at the end of a settings row. */
 sealed interface DeckRowEnd {
@@ -89,14 +89,6 @@ interface DesignSystem {
         modifier: Modifier,
         onBack: (() -> Unit)?,
         content: @Composable (PaddingValues) -> Unit,
-    )
-
-    @Composable
-    fun Card(
-        title: String,
-        subtitle: String?,
-        onClick: () -> Unit,
-        modifier: Modifier,
     )
 
     @Composable
@@ -195,15 +187,6 @@ interface DesignSystem {
         count: Int,
         current: Int,
         label: String?,
-        modifier: Modifier,
-    )
-
-    /** A row with a label and a switch; the whole row toggles. */
-    @Composable
-    fun SwitchRow(
-        label: String,
-        checked: Boolean,
-        onCheckedChange: (Boolean) -> Unit,
         modifier: Modifier,
     )
 
@@ -339,14 +322,6 @@ fun DeckScaffold(
 ) = LocalDesignSystem.current.Scaffold(title, modifier, onBack, content)
 
 @Composable
-fun DeckCard(
-    title: String,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    subtitle: String? = null,
-) = LocalDesignSystem.current.Card(title, subtitle, onClick, modifier)
-
-@Composable
 fun DeckButton(
     text: String,
     onClick: () -> Unit,
@@ -449,14 +424,6 @@ fun DeckPageIndicator(
     modifier: Modifier = Modifier,
     label: String? = null,
 ) = LocalDesignSystem.current.PageIndicator(count, current, label, modifier)
-
-@Composable
-fun DeckSwitchRow(
-    label: String,
-    checked: Boolean,
-    onCheckedChange: (Boolean) -> Unit,
-    modifier: Modifier = Modifier,
-) = LocalDesignSystem.current.SwitchRow(label, checked, onCheckedChange, modifier)
 
 @Composable
 fun DeckModal(

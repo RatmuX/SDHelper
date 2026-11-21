@@ -14,6 +14,7 @@ import io.github.ratmux.sdhelper.data.settings.DataStoreSettingsStore
 import io.github.ratmux.sdhelper.feature.connection.connectionFeatureModule
 import io.github.ratmux.sdhelper.feature.deck.deckFeatureModule
 import io.github.ratmux.sdhelper.feature.deckeditor.deckEditorFeatureModule
+import io.github.ratmux.sdhelper.feature.home.homeFeatureModule
 import io.github.ratmux.sdhelper.feature.settings.settingsFeatureModule
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -39,6 +40,7 @@ val allModules =
         appModule,
         connectionModule,
         connectionFeatureModule,
+        homeFeatureModule,
         deckFeatureModule,
         deckEditorFeatureModule,
         settingsFeatureModule,

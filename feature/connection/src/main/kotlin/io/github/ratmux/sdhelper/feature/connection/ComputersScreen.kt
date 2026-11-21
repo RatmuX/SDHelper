@@ -23,9 +23,11 @@ import io.github.ratmux.sdhelper.core.model.LocalNetworkAccess
 import io.github.ratmux.sdhelper.ui.designapi.DeckButton
 import io.github.ratmux.sdhelper.ui.designapi.DeckDialog
 import io.github.ratmux.sdhelper.ui.designapi.DeckEmphasis
-import io.github.ratmux.sdhelper.ui.designapi.DeckListItem
 import io.github.ratmux.sdhelper.ui.designapi.DeckProgress
+import io.github.ratmux.sdhelper.ui.designapi.DeckRowEnd
 import io.github.ratmux.sdhelper.ui.designapi.DeckScaffold
+import io.github.ratmux.sdhelper.ui.designapi.DeckSettingsGroup
+import io.github.ratmux.sdhelper.ui.designapi.DeckSettingsRow
 import io.github.ratmux.sdhelper.ui.designapi.DeckStatusMessage
 import io.github.ratmux.sdhelper.ui.designapi.DeckText
 import io.github.ratmux.sdhelper.ui.designapi.DeckTextStyle
@@ -49,7 +51,12 @@ fun ComputersScreen(
 
     DeckScaffold(title = stringResource(R.string.computers_title), modifier = modifier, onBack = onBack) { padding ->
         Column(
-            modifier = Modifier.padding(padding).padding(16.dp).verticalScroll(rememberScrollState()),
+            modifier =
+                Modifier
+                    .padding(
+                        padding,
+                    ).padding(start = 20.dp, end = 20.dp, top = 12.dp, bottom = 24.dp)
+                    .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             if (!state.localNetworkGranted) {
@@ -67,25 +74,29 @@ fun ComputersScreen(
 
             if (state.active != null) ConnectionStatusMessage(state.connection)
 
-            DeckText(stringResource(R.string.computers_paired), style = DeckTextStyle.TITLE)
+            DeckText(
+                stringResource(R.string.computers_paired),
+                style = DeckTextStyle.SECTION,
+                modifier = Modifier.padding(start = 16.dp, top = 8.dp),
+            )
             if (state.computers.isEmpty()) {
-                DeckText(stringResource(R.string.computers_none), style = DeckTextStyle.CAPTION)
-            }
-            state.computers.forEach { computer ->
-                DeckListItem(
-                    title = computer.name,
-                    supporting = "${computer.host}:${computer.port}",
-                    trailing =
-                        if (computer.agentId ==
-                            state.activeAgentId
-                        ) {
-                            stringResource(R.string.computers_active)
-                        } else {
-                            null
-                        },
-                    onClick = { viewModel.select(computer.agentId) },
-                    modifier = Modifier.fillMaxWidth(),
+                DeckText(
+                    stringResource(R.string.computers_none),
+                    style = DeckTextStyle.SUPPORTING,
+                    modifier = Modifier.padding(start = 16.dp),
                 )
+            } else {
+                DeckSettingsGroup {
+                    state.computers.forEach { computer ->
+                        DeckSettingsRow(
+                            title = computer.name,
+                            summary = "${computer.host}:${computer.port}",
+                            iconKey = "computer",
+                            end = if (computer.agentId == state.activeAgentId) DeckRowEnd.Check else DeckRowEnd.None,
+                            onClick = { viewModel.select(computer.agentId) },
+                        )
+                    }
+                }
             }
             if (state.active != null) {
                 DeckButton(
@@ -97,14 +108,21 @@ fun ComputersScreen(
             }
 
             if (state.discovered.isNotEmpty()) {
-                DeckText(stringResource(R.string.computers_found), style = DeckTextStyle.TITLE)
-                state.discovered.forEach { found ->
-                    DeckListItem(
-                        title = found.name,
-                        supporting = "${found.host}:${found.port}",
-                        onClick = { onAddComputer(found.host, found.port) },
-                        modifier = Modifier.fillMaxWidth(),
-                    )
+                DeckText(
+                    stringResource(R.string.computers_found),
+                    style = DeckTextStyle.SECTION,
+                    modifier = Modifier.padding(start = 16.dp, top = 8.dp),
+                )
+                DeckSettingsGroup {
+                    state.discovered.forEach { found ->
+                        DeckSettingsRow(
+                            title = found.name,
+                            summary = "${found.host}:${found.port}",
+                            iconKey = "computer",
+                            end = DeckRowEnd.Chevron,
+                            onClick = { onAddComputer(found.host, found.port) },
+                        )
+                    }
                 }
             }
 

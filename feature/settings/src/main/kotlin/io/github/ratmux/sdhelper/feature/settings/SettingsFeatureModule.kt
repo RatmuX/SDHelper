@@ -6,5 +6,5 @@ import org.koin.dsl.module
 /** Koin module of this feature's view models. */
 val settingsFeatureModule =
     module {
-        viewModel { SettingsViewModel(settings = get()) }
+        viewModel { SettingsViewModel(settings = get(), profiles = get()) }
     }
