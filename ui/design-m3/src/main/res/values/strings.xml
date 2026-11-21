@@ -2,4 +2,6 @@
 <resources>
     <string name="design_back">Back</string>
     <string name="design_page_indicator">Page %1$d of %2$d</string>
+    <string name="design_menu">Open menu</string>
+    <string name="design_empty_key">Empty</string>
 </resources>

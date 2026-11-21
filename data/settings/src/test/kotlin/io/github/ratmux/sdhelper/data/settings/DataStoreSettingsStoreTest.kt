@@ -1,7 +1,11 @@
 package io.github.ratmux.sdhelper.data.settings
 
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.stringPreferencesKey
+import io.github.ratmux.sdhelper.core.model.AppMode
 import io.github.ratmux.sdhelper.core.model.AppSettings
+import io.github.ratmux.sdhelper.core.model.ThemeMode
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import kotlin.io.path.createTempDirectory
@@ -31,5 +35,22 @@ class DataStoreSettingsStoreTest {
 
             store.update { it.copy(keepScreenOn = false) }
             assertEquals(AppSettings(hapticFeedback = false, keepScreenOn = false), store.settings.first())
+        }
+
+    @Test
+    fun `theme and last mode persist, unknown stored values read as defaults`() =
+        runTest {
+            val store = DataStoreSettingsStore(dataStore)
+            store.update { it.copy(themeMode = ThemeMode.DARK, lastMode = AppMode.KEYBOARD) }
+            val reloaded = DataStoreSettingsStore(dataStore).settings.first()
+            assertEquals(ThemeMode.DARK, reloaded.themeMode)
+            assertEquals(AppMode.KEYBOARD, reloaded.lastMode)
+            assertEquals(true, reloaded.hapticFeedback, "other settings untouched")
+
+            dataStore.edit {
+                it[stringPreferencesKey("theme_mode")] = "SEPIA"
+                it[stringPreferencesKey("last_mode")] = "HOLOGRAM"
+            }
+            assertEquals(AppSettings(), store.settings.first())
         }
 }

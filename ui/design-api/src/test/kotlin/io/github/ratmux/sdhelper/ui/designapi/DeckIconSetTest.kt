@@ -43,4 +43,30 @@ class DeckIconSetTest {
             assertNotEquals(R.drawable.ic_deck_apps, DeckIconSet.resolve(key, false), key)
         }
     }
+
+    @Test
+    fun `the keys of the app's own screens each have an icon of their own`() {
+        val keys =
+            listOf(
+                "touchpad",
+                "keyboard",
+                "computer",
+                "general",
+                "palette",
+                "theme",
+                "light",
+                "dark",
+                "settings",
+                "list",
+                "add",
+                "edit",
+                "check",
+                "pages",
+                "grid",
+            )
+        val resolved = keys.map { DeckIconSet.resolve(it, null) }
+        assertEquals(keys.size, resolved.toSet().size, "no two keys share an icon")
+        assertEquals(false, R.drawable.ic_deck_apps in resolved, "none falls back to the generic icon")
+        assertEquals(true, keys.all { it in DeckIconSet.keys })
+    }
 }

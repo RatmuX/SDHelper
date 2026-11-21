@@ -100,12 +100,34 @@ interface LocalNetworkAccess {
     }
 }
 
+/** Light or dark appearance. [SYSTEM] follows the phone until the person picks one. */
+enum class ThemeMode {
+    SYSTEM,
+    LIGHT,
+    DARK,
+    ;
+
+    /** Whether the dark palette applies, given whether the phone itself is in dark mode. */
+    fun isDark(systemDark: Boolean): Boolean =
+        when (this) {
+            SYSTEM -> systemDark
+            LIGHT -> false
+            DARK -> true
+        }
+}
+
+/** The modes of the app, shown in the navigation drawer. Only the Stream Deck exists so far. */
+enum class AppMode { STREAM_DECK, TOUCH_PAD, KEYBOARD }
+
 /** Phone-wide preferences. */
 data class AppSettings(
     /** Short vibration when a button is pressed on the control panel. */
     val hapticFeedback: Boolean = true,
     /** Keep the screen on while the control panel is open. */
     val keepScreenOn: Boolean = true,
+    val themeMode: ThemeMode = ThemeMode.SYSTEM,
+    /** The mode the home screen opens in, restored on the next start. */
+    val lastMode: AppMode = AppMode.STREAM_DECK,
 )
 
 /** Persistent [AppSettings]. Implemented by `data:settings`. */

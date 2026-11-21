@@ -15,7 +15,32 @@ import androidx.compose.ui.res.painterResource
 object DeckIconSet {
     /** Keys of the icons the set knows. Anything else resolves to a generic icon. */
     val keys: Set<String> =
-        setOf("volume_up", "volume_down", "volume_off", "mic", "mic_off", "play_pause", "skip_next", "skip_previous")
+        setOf(
+            "volume_up",
+            "volume_down",
+            "volume_off",
+            "mic",
+            "mic_off",
+            "play_pause",
+            "skip_next",
+            "skip_previous",
+            "apps",
+            "touchpad",
+            "keyboard",
+            "computer",
+            "general",
+            "palette",
+            "theme",
+            "light",
+            "dark",
+            "settings",
+            "list",
+            "add",
+            "edit",
+            "check",
+            "pages",
+            "grid",
+        )
 
     /**
      * The drawable for [key]. Toggle actions have two faces: while [toggled] is true `mic_off` shows the crossed
@@ -34,6 +59,22 @@ object DeckIconSet {
             "play_pause" -> if (toggled == true) R.drawable.ic_deck_pause else R.drawable.ic_deck_play_arrow
             "skip_next" -> R.drawable.ic_deck_skip_next
             "skip_previous" -> R.drawable.ic_deck_skip_previous
+            "apps" -> R.drawable.ic_deck_apps
+            "touchpad" -> R.drawable.ic_deck_touchpad
+            "keyboard" -> R.drawable.ic_deck_keyboard
+            "computer" -> R.drawable.ic_deck_computer
+            "general" -> R.drawable.ic_deck_general
+            "palette" -> R.drawable.ic_deck_palette
+            "theme" -> R.drawable.ic_deck_theme
+            "light" -> R.drawable.ic_deck_light
+            "dark" -> R.drawable.ic_deck_dark
+            "settings" -> R.drawable.ic_deck_settings
+            "list" -> R.drawable.ic_deck_list
+            "add" -> R.drawable.ic_deck_add
+            "edit" -> R.drawable.ic_deck_edit
+            "check" -> R.drawable.ic_deck_check
+            "pages" -> R.drawable.ic_deck_pages
+            "grid" -> R.drawable.ic_deck_grid
             else -> R.drawable.ic_deck_apps
         }
 }
