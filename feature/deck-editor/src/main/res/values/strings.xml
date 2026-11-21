@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="editor_page_options">Page…</string>
     <string name="editor_default_page">Page %1$d</string>
-    <string name="editor_hint">Tap a cell to change it. Press and hold a button, then drag it to another cell; hold it at the edge to change page.</string>
     <string name="editor_close">Close</string>
     <string name="editor_cancel">Cancel</string>
     <string name="editor_ok">OK</string>
@@ -37,20 +35,16 @@
     <string name="editor_message_page_full">That page is full.</string>
     <string name="editor_message_page_limit">A layout can have at most %1$d pages.</string>
     <string name="editor_not_available">Not on this computer</string>
-    <string name="layouts_title">Layouts</string>
-    <string name="layouts_active">Active</string>
-    <string name="layouts_summary">%1$d pages, %2$d × %3$d</string>
-    <string name="layouts_new">New layout…</string>
     <string name="layouts_empty">Empty layout</string>
     <string name="layouts_empty_hint">Start from nothing and place the buttons yourself.</string>
     <string name="layouts_name_title">Layout name</string>
-    <string name="layouts_use">Use this layout</string>
-    <string name="layouts_rename">Rename…</string>
-    <string name="layouts_copy">Make a copy</string>
-    <string name="layouts_delete">Delete…</string>
-    <string name="layouts_delete_title">Delete layout?</string>
-    <string name="layouts_delete_message">The layout \"%1$s\" and all its pages will be removed.</string>
-    <string name="layouts_delete_confirm">Delete</string>
-    <string name="layouts_last">There must be at least one layout, so the last one cannot be deleted.</string>
     <string name="layouts_default_name">New layout</string>
+    <string name="preset_menu">Ready-made settings</string>
+    <string name="preset_save">Save</string>
+    <string name="preset_new">New</string>
+    <string name="preset_rename">Name it</string>
+    <string name="preset_pages">Pages…</string>
+    <string name="preset_grid">Grid size…</string>
+    <string name="preset_heading">READY-MADE SETTINGS</string>
+    <string name="editor_page_label">%1$s · %2$d / %3$d</string>
 </resources>

@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="editor_page_options">Sayfa…</string>
     <string name="editor_default_page">Sayfa %1$d</string>
-    <string name="editor_hint">Değiştirmek için bir hücreye dokun. Bir tuşa basılı tutup başka bir hücreye sürükle; sayfayı değiştirmek için kenarda beklet.</string>
     <string name="editor_close">Kapat</string>
     <string name="editor_cancel">Vazgeç</string>
     <string name="editor_ok">Tamam</string>
@@ -37,20 +35,16 @@
     <string name="editor_message_page_full">Bu sayfa dolu.</string>
     <string name="editor_message_page_limit">Bir düzende en fazla %1$d sayfa olabilir.</string>
     <string name="editor_not_available">Bu bilgisayarda yok</string>
-    <string name="layouts_title">Düzenler</string>
-    <string name="layouts_active">Etkin</string>
-    <string name="layouts_summary">%1$d sayfa, %2$d × %3$d</string>
-    <string name="layouts_new">Yeni düzen…</string>
     <string name="layouts_empty">Boş düzen</string>
     <string name="layouts_empty_hint">Sıfırdan başla, tuşları kendin yerleştir.</string>
     <string name="layouts_name_title">Düzen adı</string>
-    <string name="layouts_use">Bu düzeni kullan</string>
-    <string name="layouts_rename">Yeniden adlandır…</string>
-    <string name="layouts_copy">Kopyasını oluştur</string>
-    <string name="layouts_delete">Sil…</string>
-    <string name="layouts_delete_title">Düzen silinsin mi?</string>
-    <string name="layouts_delete_message">\"%1$s\" düzeni ve tüm sayfaları kaldırılacak.</string>
-    <string name="layouts_delete_confirm">Sil</string>
-    <string name="layouts_last">En az bir düzen olmalı, bu yüzden son düzen silinemez.</string>
     <string name="layouts_default_name">Yeni düzen</string>
+    <string name="preset_menu">Hazır ayarlar</string>
+    <string name="preset_save">Kaydet</string>
+    <string name="preset_new">Yeni yap</string>
+    <string name="preset_rename">İsim ver</string>
+    <string name="preset_pages">Sayfalar…</string>
+    <string name="preset_grid">Izgara boyutu…</string>
+    <string name="preset_heading">HAZIR AYARLAR</string>
+    <string name="editor_page_label">%1$s · %2$d / %3$d</string>
 </resources>

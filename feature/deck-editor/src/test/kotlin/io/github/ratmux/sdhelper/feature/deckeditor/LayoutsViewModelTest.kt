@@ -100,7 +100,7 @@ class LayoutsViewModelTest {
             viewModel(language = "tr").addFromPreset("streaming", "")
 
             val added = profiles.list.value.last()
-            assertEquals("Yayın", added.name)
+            assertEquals("Yayın modu", added.name)
             assertEquals("Canlı", added.pages.first().name)
             assertEquals(added.id, profiles.active.value)
         }
@@ -113,34 +113,7 @@ class LayoutsViewModelTest {
             vm.addFromPreset("gaming", "")
             vm.addFromPreset("nonexistent", "")
 
-            assertEquals(listOf("Everyday", "Gaming", "Gaming (2)"), profiles.list.value.map { it.name })
-        }
-
-    @Test
-    fun `duplicating copies the layout with new ids and a new name`() =
-        runTest {
-            val vm = viewModel()
-            vm.duplicate(everyday.id)
-
-            val copy = profiles.list.value.last()
-            assertEquals("Everyday (2)", copy.name)
-            assertNotEquals(everyday.id, copy.id)
-            assertEquals(everyday.pages.map { it.slots }, copy.pages.map { it.slots }, "same buttons")
-            assertTrue(
-                (everyday.pages.map { it.id } + copy.pages.map { it.id }).toSet().size == everyday.pages.size * 2,
-            )
-        }
-
-    @Test
-    fun `copies of long names stay within the length limit`() =
-        runTest {
-            val long = everyday.copy(name = "n".repeat(LayoutLimits.MAX_NAME_LENGTH))
-            val store = FakeProfiles(listOf(long))
-            val vm = LayoutsViewModel(store, { "en" }, { "Page $it" }, newId)
-            vm.duplicate(long.id)
-            val copy = store.list.value.last()
-            assertTrue(copy.name.length <= LayoutLimits.MAX_NAME_LENGTH)
-            assertTrue(copy.name.endsWith(" (2)"))
+            assertEquals(listOf("Default", "Gaming", "Gaming (2)"), profiles.list.value.map { it.name })
         }
 
     @Test
@@ -173,37 +146,6 @@ class LayoutsViewModelTest {
             val gaming = profiles.list.value.last()
             vm.activate(gaming.id)
             assertEquals(gaming.id, profiles.active.value)
-        }
-
-    @Test
-    fun `the last layout cannot be deleted and the person is told`() =
-        runTest {
-            val vm = viewModel()
-            vm.collected { state ->
-                vm.delete(everyday.id)
-
-                assertEquals(1, profiles.list.value.size)
-                assertEquals(LayoutsMessage.LAST_LAYOUT_CANNOT_BE_DELETED, state.first { it.message != null }.message)
-                vm.dismissMessage()
-                assertNull(state.first { it.message == null }.message)
-            }
-        }
-
-    @Test
-    fun `deleting the active layout activates another`() =
-        runTest {
-            val vm = viewModel()
-            vm.addFromPreset("gaming", "")
-            vm.delete(everyday.id)
-
-            assertEquals(1, profiles.list.value.size)
-            assertEquals(
-                profiles.list.value
-                    .single()
-                    .id,
-                profiles.active.value,
-            )
-            assertFalse(profiles.list.value.any { it.id == everyday.id })
         }
 
     @Test
@@ -248,7 +190,7 @@ class LayoutsViewModelTest {
             val vm = viewModel()
             vm.saveCopy(everyday.id, "  Evening ")
 
-            assertEquals(listOf("Everyday", "Evening"), profiles.list.value.map { it.name })
+            assertEquals(listOf("Default", "Evening"), profiles.list.value.map { it.name })
             assertEquals(everyday.id, profiles.active.value)
             assertEquals(
                 everyday.pages.map { it.slots },

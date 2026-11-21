@@ -69,7 +69,7 @@ fun AppNavigation() {
                     )
                 }
                 entry<DeckRoute> {
-                    DeckScreen(onOpenComputers = { backStack.add(ComputersRoute) })
+                    DeckScreen()
                 }
                 entry<EditorRoute> { EditorScreen() }
                 entry<SettingsRoute> {

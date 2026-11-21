@@ -122,7 +122,6 @@ class DeckViewModelTest {
             viewModel().collected { state ->
                 val ui = state.first { it.profile != null }
                 assertEquals(everyday.id, ui.profile?.id)
-                assertEquals(2, ui.profiles.size)
                 assertEquals(everyday.buttonCount, ui.buttons.size)
             }
         }
@@ -167,17 +166,16 @@ class DeckViewModelTest {
         }
 
     @Test
-    fun `an unknown active id falls back to the first profile, and selecting switches`() =
+    fun `an unknown active id falls back to the first profile, and the panel follows a change of the active one`() =
         runTest {
             val profiles = FakeProfiles(listOf(everyday, gaming), active = "gone")
             val vm = viewModel(profiles)
             vm.collected { state ->
                 assertEquals(everyday.id, state.first { it.profile != null }.profile?.id)
 
-                vm.selectProfile(gaming.id)
+                profiles.active.value = gaming.id
                 assertEquals(gaming.id, state.first { it.profile?.id == gaming.id }.profile?.id)
             }
-            assertEquals(gaming.id, profiles.active.value)
         }
 
     @Test

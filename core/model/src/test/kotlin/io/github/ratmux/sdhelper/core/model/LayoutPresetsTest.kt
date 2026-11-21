@@ -70,7 +70,7 @@ class LayoutPresetsTest {
         assertEquals("System", everyday.pages[1].name)
         assertEquals(DeckSlot.Action(BuiltinActions.PLAY_PAUSE), everyday.slotAt(SlotPosition(0, 1)))
         assertEquals(DeckSlot.Action(BuiltinActions.MUTE_MICROPHONE), everyday.slotAt(SlotPosition(1, 3)))
-        assertEquals("Günlük", LayoutPresets.EVERYDAY.create("tr").name)
+        assertEquals("Varsayılan", LayoutPresets.EVERYDAY.create("tr").name)
     }
 
     @Test

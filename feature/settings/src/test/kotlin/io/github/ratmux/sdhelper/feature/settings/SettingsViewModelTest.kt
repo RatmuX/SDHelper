@@ -136,7 +136,7 @@ class SettingsViewModelTest {
 
             vm.duplicate(everyday.id)
             assertEquals(
-                "Everyday (2)",
+                "Default (2)",
                 profiles.list.value
                     .last()
                     .name,

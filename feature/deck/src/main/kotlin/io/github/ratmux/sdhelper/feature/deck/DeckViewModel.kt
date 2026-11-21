@@ -36,7 +36,6 @@ sealed interface DeckMessage {
 data class DeckUiState(
     /** The active layout, or null for a moment at the very first start. */
     val profile: DeckProfile? = null,
-    val profiles: List<DeckProfile> = emptyList(),
     /** Every button used by the active layout, by action id. */
     val buttons: Map<String, ButtonModel> = emptyMap(),
     val connection: ConnectionState = ConnectionState.Disconnected,
@@ -62,7 +61,7 @@ class DeckViewModel(
 
     private val layout =
         combine(profiles.profiles, profiles.activeProfileId) { all, activeId ->
-            (all.firstOrNull { it.id == activeId } ?: all.firstOrNull()) to all
+            all.firstOrNull { it.id == activeId } ?: all.firstOrNull()
         }
 
     private val live =
@@ -77,10 +76,9 @@ class DeckViewModel(
         }
 
     val state: StateFlow<DeckUiState> =
-        combine(layout, live, settings.settings, message) { (profile, all), liveData, appSettings, notice ->
+        combine(layout, live, settings.settings, message) { profile, liveData, appSettings, notice ->
             DeckUiState(
                 profile = profile,
-                profiles = all,
                 buttons =
                     profile
                         ?.pages
@@ -111,10 +109,6 @@ class DeckViewModel(
                     is InvokeOutcome.Failure -> DeckMessage.Refused(outcome.message)
                 }
         }
-    }
-
-    fun selectProfile(profileId: String) {
-        viewModelScope.launch { profiles.setActive(profileId) }
     }
 
     fun dismissMessage() {

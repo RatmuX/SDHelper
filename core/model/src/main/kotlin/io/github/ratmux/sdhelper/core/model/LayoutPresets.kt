@@ -57,7 +57,7 @@ object LayoutPresets {
     val EVERYDAY =
         LayoutPreset(
             id = "everyday",
-            title = mapOf("en" to "Everyday", "tr" to "Günlük"),
+            title = mapOf("en" to "Default", "tr" to "Varsayılan"),
             description =
                 mapOf(
                     "en" to "Media controls on the first page, volume and microphone on the second.",
@@ -84,7 +84,7 @@ object LayoutPresets {
     val STREAMING =
         LayoutPreset(
             id = "streaming",
-            title = mapOf("en" to "Streaming", "tr" to "Yayın"),
+            title = mapOf("en" to "Streaming", "tr" to "Yayın modu"),
             description =
                 mapOf(
                     "en" to
@@ -137,7 +137,31 @@ object LayoutPresets {
                 ),
         )
 
-    val all: List<LayoutPreset> = listOf(EVERYDAY, STREAMING, GAMING)
+    val MEETING =
+        LayoutPreset(
+            id = "meeting",
+            title = mapOf("en" to "Meeting", "tr" to "Toplantı"),
+            description =
+                mapOf(
+                    "en" to "Microphone and speaker mute first, then the volume, all on one page.",
+                    "tr" to "Önce mikrofon ve hoparlör sustur, sonra ses; hepsi tek sayfada.",
+                ),
+            pages =
+                listOf(
+                    LayoutPreset.PresetPage(
+                        mapOf("en" to "Meeting", "tr" to "Toplantı"),
+                        listOf(
+                            BuiltinActions.MUTE_MICROPHONE,
+                            BuiltinActions.MUTE_OUTPUT,
+                            BuiltinActions.VOLUME_DOWN,
+                            BuiltinActions.VOLUME_UP,
+                        ),
+                    ),
+                ),
+        )
+
+    /** The order the starter layouts are created in on the first start and offered in the editor. */
+    val all: List<LayoutPreset> = listOf(EVERYDAY, STREAMING, MEETING, GAMING)
 
     fun byId(id: String): LayoutPreset? = all.firstOrNull { it.id == id }
 }

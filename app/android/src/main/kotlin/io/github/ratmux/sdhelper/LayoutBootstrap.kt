@@ -8,8 +8,8 @@ import kotlinx.coroutines.launch
 import java.util.Locale
 
 /**
- * Makes sure there is always a layout to show: on the first start (or after damaged data was discarded) the
- * "Everyday" starter layout is created in the phone's language and becomes the active one.
+ * Makes sure there are layouts to show: on the first start (or after damaged data was discarded) the starter
+ * layouts (default, streaming, meeting, gaming) are created in the phone's language; the first one is active.
  */
 class LayoutBootstrap(
     store: ProfileStore,
@@ -18,7 +18,10 @@ class LayoutBootstrap(
 ) {
     init {
         scope.launch {
-            if (store.profiles.first().isEmpty()) store.save(LayoutPresets.EVERYDAY.create(language))
+            if (store.profiles.first().isEmpty()) {
+                // saved in this order; the first profile saved becomes the active one
+                LayoutPresets.all.forEach { store.save(it.create(language)) }
+            }
         }
     }
 }

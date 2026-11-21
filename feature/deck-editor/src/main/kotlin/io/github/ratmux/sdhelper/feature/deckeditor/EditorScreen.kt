@@ -5,8 +5,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
@@ -54,6 +56,7 @@ import io.github.ratmux.sdhelper.ui.designapi.DeckEmptyTile
 import io.github.ratmux.sdhelper.ui.designapi.DeckListItem
 import io.github.ratmux.sdhelper.ui.designapi.DeckModal
 import io.github.ratmux.sdhelper.ui.designapi.DeckPageIndicator
+import io.github.ratmux.sdhelper.ui.designapi.DeckPill
 import io.github.ratmux.sdhelper.ui.designapi.DeckStatusMessage
 import io.github.ratmux.sdhelper.ui.designapi.DeckText
 import io.github.ratmux.sdhelper.ui.designapi.DeckTextField
@@ -65,6 +68,7 @@ import kotlin.math.roundToInt
 
 private const val MESSAGE_MILLIS = 4_000L
 private const val DWELL_POLL_MILLIS = 50L
+private val PILL_ROOM = 56.dp
 
 /** A button being dragged: where it came from and where the finger is, in the pager's pixel space. */
 private data class DragState(
@@ -88,8 +92,6 @@ private sealed interface Dialog {
     ) : Dialog
 
     data object PageOptions : Dialog
-
-    data object Layouts : Dialog
 
     data object RenamePage : Dialog
 
@@ -124,6 +126,7 @@ private fun EditorBody(
 ) {
     val pager = rememberPagerState { profile.pages.size }
     var dialog by remember { mutableStateOf<Dialog?>(null) }
+    var menu by remember { mutableStateOf(PresetMenuState.CLOSED) }
     var drag by remember { mutableStateOf<DragState?>(null) }
     var geometry by remember { mutableStateOf<GridGeometry?>(null) }
     var containerSize by remember { mutableStateOf(IntSize.Zero) }
@@ -204,152 +207,128 @@ private fun EditorBody(
             }
         }
 
-    Column(Modifier.fillMaxSize().safeDrawingPadding().padding(horizontal = 12.dp)) {
-        Header(
-            state,
-            profile,
-            pager,
-            onPageOptions = { dialog = Dialog.PageOptions },
-            onLayouts = { dialog = Dialog.Layouts },
-        )
-        Box(
-            Modifier
-                .weight(1f)
-                .fillMaxWidth()
-                .onSizeChanged { containerSize = it }
-                .gridGestures(enabled = true, geometry = { geometry }, handler = handler),
-        ) {
-            HorizontalPager(
-                state = pager,
-                modifier = Modifier.fillMaxSize(),
-                pageSpacing = 16.dp,
-                userScrollEnabled = drag == null,
-            ) { pageIndex ->
-                DeckGridPage(
-                    columns = profile.grid.columns,
-                    rows = profile.grid.rows,
-                    onGeometry = { geometry = it },
-                ) { index, cell ->
-                    val position = SlotPosition(pageIndex, index)
-                    val hovered =
-                        drag?.let { d ->
-                            pageIndex == pager.currentPage &&
-                                geometry?.cellAt(d.pointer.x, d.pointer.y) == index
-                        } ==
-                            true
-                    when (val slot = profile.pages[pageIndex].slots[index]) {
-                        is DeckSlot.Action -> {
-                            val button = state.buttons[slot.actionId]
-                            DeckButtonTile(
-                                title = button?.title ?: slot.actionId,
-                                modifier = cell,
-                                iconKey = button?.iconKey,
-                                enabled = drag?.from != position,
-                                highlighted = hovered,
-                            )
-                        }
+    Box(Modifier.fillMaxSize().safeDrawingPadding()) {
+        Column(Modifier.fillMaxSize().padding(horizontal = 12.dp)) {
+            // room for the "ready-made settings" pill in the top corner
+            Spacer(Modifier.height(PILL_ROOM))
+            Box(
+                Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+                    .onSizeChanged { containerSize = it }
+                    .gridGestures(enabled = true, geometry = { geometry }, handler = handler),
+            ) {
+                HorizontalPager(
+                    state = pager,
+                    modifier = Modifier.fillMaxSize(),
+                    pageSpacing = 16.dp,
+                    userScrollEnabled = drag == null,
+                ) { pageIndex ->
+                    DeckGridPage(
+                        columns = profile.grid.columns,
+                        rows = profile.grid.rows,
+                        onGeometry = { geometry = it },
+                    ) { index, cell ->
+                        val position = SlotPosition(pageIndex, index)
+                        val hovered =
+                            drag?.let { d ->
+                                pageIndex == pager.currentPage &&
+                                    geometry?.cellAt(d.pointer.x, d.pointer.y) == index
+                            } ==
+                                true
+                        when (val slot = profile.pages[pageIndex].slots[index]) {
+                            is DeckSlot.Action -> {
+                                val button = state.buttons[slot.actionId]
+                                DeckButtonTile(
+                                    title = button?.title ?: slot.actionId,
+                                    modifier = cell,
+                                    iconKey = button?.iconKey,
+                                    enabled = drag?.from != position,
+                                    highlighted = hovered,
+                                    number = index + 1,
+                                )
+                            }
 
-                        null -> {
-                            DeckEmptyTile(modifier = cell, highlighted = hovered)
+                            null -> {
+                                DeckEmptyTile(modifier = cell, highlighted = hovered, number = index + 1)
+                            }
                         }
                     }
                 }
-            }
-            drag?.let { d ->
-                val g = geometry
-                if (g != null) {
-                    val button = state.buttons[d.actionId]
-                    val tile = with(LocalDensity.current) { g.tile.toDp() }
-                    DeckButtonTile(
-                        title = button?.title ?: d.actionId,
-                        modifier =
-                            Modifier
-                                .zIndex(1f)
-                                .offset {
-                                    androidx.compose.ui.unit.IntOffset(
-                                        (d.pointer.x - g.tile / 2).roundToInt(),
-                                        (
-                                            d.pointer.y -
-                                                g.tile / 2
-                                        ).roundToInt(),
-                                    )
-                                }.size(tile)
-                                .alpha(0.92f),
-                        iconKey = button?.iconKey,
-                        highlighted = true,
-                    )
+                drag?.let { d ->
+                    val g = geometry
+                    if (g != null) {
+                        val button = state.buttons[d.actionId]
+                        val tile = with(LocalDensity.current) { g.tile.toDp() }
+                        DeckButtonTile(
+                            title = button?.title ?: d.actionId,
+                            modifier =
+                                Modifier
+                                    .zIndex(1f)
+                                    .offset {
+                                        androidx.compose.ui.unit.IntOffset(
+                                            (d.pointer.x - g.tile / 2).roundToInt(),
+                                            (
+                                                d.pointer.y -
+                                                    g.tile / 2
+                                            ).roundToInt(),
+                                        )
+                                    }.size(tile)
+                                    .alpha(0.92f),
+                            iconKey = button?.iconKey,
+                            highlighted = true,
+                        )
+                    }
                 }
             }
+            DeckPageIndicator(
+                count = profile.pages.size,
+                current = pager.currentPage,
+                modifier = Modifier.align(Alignment.CenterHorizontally).padding(top = 4.dp, bottom = 12.dp),
+                label =
+                    stringResource(
+                        R.string.editor_page_label,
+                        profile.pages
+                            .getOrNull(pager.currentPage)
+                            ?.name
+                            .orEmpty(),
+                        pager.currentPage + 1,
+                        profile.pages.size,
+                    ),
+            )
         }
+        DeckPill(
+            text = stringResource(R.string.preset_menu),
+            expanded = menu != PresetMenuState.CLOSED,
+            onClick = { menu = if (menu == PresetMenuState.CLOSED) PresetMenuState.MAIN else PresetMenuState.CLOSED },
+            modifier = Modifier.align(Alignment.TopEnd).padding(top = 12.dp, end = 16.dp),
+        )
+        state.message?.let { notice ->
+            DeckStatusMessage(
+                text = noticeText(notice),
+                modifier = Modifier.align(Alignment.TopStart).padding(top = 12.dp, start = 16.dp),
+                tone = DeckTone.ERROR,
+            )
+        }
+        PresetMenu(
+            menu = menu,
+            onMenu = { menu = it },
+            active = profile,
+            onPages = { dialog = Dialog.PageOptions },
+            onGridSize = { dialog = Dialog.GridSizes },
+        )
     }
 
     Dialogs(state, profile, pager, dialog, onDialog = { dialog = it }, viewModel)
 }
 
 @Composable
-private fun Header(
-    state: EditorUiState,
-    profile: DeckProfile,
-    pager: PagerState,
-    onPageOptions: () -> Unit,
-    onLayouts: () -> Unit,
-) {
-    Row(
-        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        DeckButton(
-            text = profile.name,
-            onClick = onLayouts,
-            emphasis = DeckEmphasis.SECONDARY,
-            modifier = Modifier.widthIn(max = 240.dp),
-        )
-        Column(Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
-            val notice = state.message
-            if (notice != null) {
-                DeckStatusMessage(
-                    text =
-                        when (notice) {
-                            EditorMessage.GRID_DOES_NOT_FIT -> {
-                                stringResource(R.string.editor_message_grid_does_not_fit)
-                            }
-
-                            EditorMessage.PAGE_FULL -> {
-                                stringResource(R.string.editor_message_page_full)
-                            }
-
-                            EditorMessage.PAGE_LIMIT -> {
-                                stringResource(
-                                    R.string.editor_message_page_limit,
-                                    LayoutLimits.MAX_PAGES,
-                                )
-                            }
-                        },
-                    tone = DeckTone.ERROR,
-                )
-            } else {
-                DeckText(
-                    profile.pages
-                        .getOrNull(pager.currentPage)
-                        ?.name
-                        .orEmpty(),
-                    style = DeckTextStyle.TITLE,
-                )
-                DeckText(
-                    stringResource(R.string.editor_hint),
-                    style = DeckTextStyle.CAPTION,
-                )
-            }
-        }
-        DeckButton(
-            text = stringResource(R.string.editor_page_options),
-            onClick = onPageOptions,
-            emphasis = DeckEmphasis.SECONDARY,
-        )
-        if (profile.pages.size > 1) DeckPageIndicator(count = profile.pages.size, current = pager.currentPage)
+private fun noticeText(notice: EditorMessage): String =
+    when (notice) {
+        EditorMessage.GRID_DOES_NOT_FIT -> stringResource(R.string.editor_message_grid_does_not_fit)
+        EditorMessage.PAGE_FULL -> stringResource(R.string.editor_message_page_full)
+        EditorMessage.PAGE_LIMIT -> stringResource(R.string.editor_message_page_limit, LayoutLimits.MAX_PAGES)
     }
-}
 
 @Composable
 private fun Dialogs(
@@ -446,10 +425,6 @@ private fun Dialogs(
                     }
                 }
             }
-        }
-
-        Dialog.Layouts -> {
-            LayoutsDialogs(onClose = close)
         }
 
         Dialog.PageOptions -> {
