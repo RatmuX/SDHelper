@@ -36,12 +36,6 @@ enum class EditorMessage {
 
     /** The profile already has the largest allowed number of pages. */
     PAGE_LIMIT,
-
-    /** A folder holds at most [io.github.ratmux.sdhelper.core.model.LayoutLimits.MAX_FOLDER_ACTIONS] buttons. */
-    FOLDER_FULL,
-
-    /** A button cannot leave its folder because no cell is free anywhere. */
-    NO_FREE_CELL,
 }
 
 /** A grid change that moves buttons to other cells; the person must confirm it first. */
@@ -105,15 +99,18 @@ class EditorViewModel(
                 profile = profile,
                 buttons =
                     profile
-                        ?.actionIds
-                        ?.associateWith { actionId ->
-                            ButtonModels.build(
-                                actionId,
-                                liveData.known,
-                                liveData.states,
-                                liveData.liveIds,
-                                liveData.connected,
-                            )
+                        ?.pages
+                        ?.flatMap { it.slots }
+                        ?.filterIsInstance<DeckSlot.Action>()
+                        ?.associate { slot ->
+                            slot.actionId to
+                                ButtonModels.build(
+                                    slot.actionId,
+                                    liveData.known,
+                                    liveData.states,
+                                    liveData.liveIds,
+                                    liveData.connected,
+                                )
                         }.orEmpty(),
                 actions = liveData.known.values.sortedBy { it.title.lowercase() },
                 pendingResize = resize,
@@ -132,62 +129,7 @@ class EditorViewModel(
     fun move(
         from: SlotPosition,
         to: SlotPosition,
-    ) = edit { profile ->
-        val moved = LayoutOps.move(profile, from, to)
-        // the only refusal a drop can meet: a button dropped on a folder that is full
-        if (moved == profile && from != to &&
-            profile.slotAt(to) is DeckSlot.Folder
-        ) {
-            message.value = EditorMessage.FOLDER_FULL
-        }
-        moved
-    }
-
-    fun createFolder(
-        at: SlotPosition,
-        name: String,
-    ) = edit { LayoutOps.createFolder(it, at, name) }
-
-    fun renameFolder(
-        at: SlotPosition,
-        name: String,
-    ) = edit { LayoutOps.renameFolder(it, at, name) }
-
-    fun addToFolder(
-        at: SlotPosition,
-        actionId: String,
-    ) = edit { profile ->
-        val added = LayoutOps.addToFolder(profile, at, actionId)
-        if (added == profile && profile.slotAt(at) is DeckSlot.Folder) message.value = EditorMessage.FOLDER_FULL
-        added
-    }
-
-    fun replaceInFolder(
-        at: SlotPosition,
-        index: Int,
-        actionId: String,
-    ) = edit { LayoutOps.replaceInFolder(it, at, index, actionId) }
-
-    fun removeFromFolder(
-        at: SlotPosition,
-        index: Int,
-    ) = edit { LayoutOps.removeFromFolder(it, at, index) }
-
-    fun moveInFolder(
-        at: SlotPosition,
-        from: Int,
-        to: Int,
-    ) = edit { LayoutOps.moveInFolder(it, at, from, to) }
-
-    /** Takes a button out of a folder onto a free cell of the layout. */
-    fun moveOutOfFolder(
-        at: SlotPosition,
-        index: Int,
-    ) = edit { profile ->
-        val result = LayoutOps.moveOutOfFolder(profile, at, index)
-        if (result == profile) message.value = EditorMessage.NO_FREE_CELL
-        result
-    }
+    ) = edit { LayoutOps.move(it, from, to) }
 
     /** Moves a button to the first free cell of [page]; the safe alternative to dragging across pages. */
     fun moveToPage(

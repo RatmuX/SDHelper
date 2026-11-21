@@ -4,7 +4,6 @@ plugins {
 
 dependencies {
     implementation(project(":ui:components"))
-    implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.koin.compose.viewmodel)

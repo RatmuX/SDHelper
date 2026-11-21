@@ -10,13 +10,10 @@ import io.github.ratmux.sdhelper.core.model.DeckActionState
 import io.github.ratmux.sdhelper.core.model.DeckActionTone
 import io.github.ratmux.sdhelper.core.model.DeckActions
 import io.github.ratmux.sdhelper.core.model.DeckProfile
-import io.github.ratmux.sdhelper.core.model.DeckSlot
 import io.github.ratmux.sdhelper.core.model.InvokeOutcome
-import io.github.ratmux.sdhelper.core.model.LayoutOps
 import io.github.ratmux.sdhelper.core.model.LayoutPresets
 import io.github.ratmux.sdhelper.core.model.ProfileStore
 import io.github.ratmux.sdhelper.core.model.SettingsStore
-import io.github.ratmux.sdhelper.core.model.SlotPosition
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.coroutineScope
@@ -215,30 +212,6 @@ class DeckViewModelTest {
                 assertFalse(ui.settings.hapticFeedback)
                 assertFalse(ui.settings.keepScreenOn)
                 assertTrue(ui.connection is ConnectionState.Connected)
-            }
-        }
-
-    @Test
-    fun `buttons inside folders are resolved like the others`() =
-        runTest {
-            val folderAt = SlotPosition(0, 7)
-            val withFolder =
-                LayoutOps.addToFolder(
-                    LayoutOps.createFolder(everyday, folderAt, "Mics"),
-                    folderAt,
-                    BuiltinActions.MUTE_MICROPHONE,
-                )
-            val only =
-                everyday.copy(
-                    pages =
-                        withFolder.pages.map { page ->
-                            page.copy(slots = page.slots.map { if (it is DeckSlot.Folder) it else null })
-                        },
-                )
-            viewModel(FakeProfiles(listOf(only), only.id)).collected { state ->
-                val ui = state.first { it.profile != null }
-                assertEquals(setOf(BuiltinActions.MUTE_MICROPHONE), ui.buttons.keys)
-                assertEquals("Mute microphone", ui.buttons.getValue(BuiltinActions.MUTE_MICROPHONE).title)
             }
         }
 }

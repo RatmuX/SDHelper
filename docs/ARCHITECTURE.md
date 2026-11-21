@@ -36,7 +36,7 @@ Verified: SMTC is exposed through `Windows.Media.Control.GlobalSystemMediaTransp
 
 ```
 build-logic/                 convention plugins
-core/model                   Action, Button, Page, Folder, Profile, Device (pure Kotlin/JVM)
+core/model                   Action, Button, Page, Profile, Device (pure Kotlin/JVM)
 core/protocol                message types, versions, channels, serialization (Kotlin/JVM)
 core/plugin-api              ActionProvider, manifest, parameter schema (Kotlin/JVM)
 core/common                  tiny helpers only
@@ -47,7 +47,7 @@ ui/components                shared building blocks made from the contract only:
 ui/design-miuix              Miuix implementation (later, Phase 5)
 feature/home                 launcher of surfaces
 feature/deck                 control panel
-feature/deck-editor          layout, pages, folders, profiles, action editing
+feature/deck-editor          layout, pages, profiles, action editing
 feature/connection           discovery, pairing, devices
 feature/settings
 data/profiles, data/devices  storage: Room (profiles), DataStore (paired computers); implement interfaces from core:model

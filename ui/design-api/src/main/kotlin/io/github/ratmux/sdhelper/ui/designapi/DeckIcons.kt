@@ -15,17 +15,7 @@ import androidx.compose.ui.res.painterResource
 object DeckIconSet {
     /** Keys of the icons the set knows. Anything else resolves to a generic icon. */
     val keys: Set<String> =
-        setOf(
-            "volume_up",
-            "volume_down",
-            "volume_off",
-            "mic",
-            "mic_off",
-            "play_pause",
-            "skip_next",
-            "skip_previous",
-            "folder",
-        )
+        setOf("volume_up", "volume_down", "volume_off", "mic", "mic_off", "play_pause", "skip_next", "skip_previous")
 
     /**
      * The drawable for [key]. Toggle actions have two faces: while [toggled] is true `mic_off` shows the crossed
@@ -44,7 +34,6 @@ object DeckIconSet {
             "play_pause" -> if (toggled == true) R.drawable.ic_deck_pause else R.drawable.ic_deck_play_arrow
             "skip_next" -> R.drawable.ic_deck_skip_next
             "skip_previous" -> R.drawable.ic_deck_skip_previous
-            "folder" -> R.drawable.ic_deck_folder
             else -> R.drawable.ic_deck_apps
         }
 }

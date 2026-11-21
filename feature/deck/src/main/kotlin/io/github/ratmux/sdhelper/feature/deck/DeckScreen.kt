@@ -1,6 +1,5 @@
 package io.github.ratmux.sdhelper.feature.deck
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -16,7 +15,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -45,7 +43,6 @@ import kotlinx.coroutines.delay
 import org.koin.compose.viewmodel.koinViewModel
 
 private const val MESSAGE_MILLIS = 4_000L
-private const val FOLDER_ICON = "folder"
 
 /**
  * The control panel: landscape, full screen, large square buttons, swipe left and right between the pages of the
@@ -69,91 +66,47 @@ fun DeckScreen(
         key(profile.id) {
             val pager = rememberPagerState { profile.pages.size }
             val haptic = LocalHapticFeedback.current
-            var openFolderId by rememberSaveable { mutableStateOf<String?>(null) }
-            val folder =
-                openFolderId?.let { id ->
-                    profile.pages
-                        .flatMap { it.slots }
-                        .filterIsInstance<DeckSlot.Folder>()
-                        .firstOrNull { it.id == id }
-                }
-            BackHandler(enabled = folder != null) { openFolderId = null }
-            val folderPages = folder?.pages(profile.grid.capacity).orEmpty()
-            // a new pager (and so the first page) for each folder
-            val folderPager = key(folder?.id) { rememberPagerState { folderPages.size.coerceAtLeast(1) } }
-            val press: (String) -> Unit = { actionId ->
-                if (state.settings.hapticFeedback) haptic.performHapticFeedback(HapticFeedbackType.ContextClick)
-                viewModel.press(actionId)
-            }
-            val actionTile: @Composable (String, Modifier) -> Unit = { actionId, cell ->
-                val button = state.buttons[actionId]
-                if (button != null) {
-                    DeckButtonTile(
-                        title = button.title,
-                        modifier = cell,
-                        iconKey = button.iconKey,
-                        toggled = button.state.toggled,
-                        label = button.state.label,
-                        tone = button.state.tone.toTileTone(),
-                        enabled = button.available,
-                        onClick = { press(button.actionId) },
-                    )
-                }
-            }
             Column(Modifier.fillMaxSize().safeDrawingPadding().padding(horizontal = 12.dp)) {
                 Header(
                     state = state,
-                    title =
-                        folder?.name
-                            ?: profile.pages
-                                .getOrNull(pager.currentPage)
-                                ?.name
-                                .orEmpty(),
-                    pageCount = if (folder != null) folderPages.size else profile.pages.size,
-                    currentPage = if (folder != null) folderPager.currentPage else pager.currentPage,
-                    inFolder = folder != null,
-                    onBack = { openFolderId = null },
+                    pageName =
+                        profile.pages
+                            .getOrNull(pager.currentPage)
+                            ?.name
+                            .orEmpty(),
+                    pageCount = profile.pages.size,
+                    currentPage = pager.currentPage,
                     onChooseProfile = { chooseProfile = true },
                     onOpenComputers = onOpenComputers,
                     onMessageShown = viewModel::dismissMessage,
                 )
-                if (folder == null) {
-                    HorizontalPager(
-                        state = pager,
-                        modifier = Modifier.weight(1f).fillMaxWidth(),
-                        pageSpacing = 16.dp,
-                    ) { pageIndex ->
-                        val page = profile.pages[pageIndex]
-                        DeckGridPage(columns = profile.grid.columns, rows = profile.grid.rows) { index, cell ->
-                            when (val slot = page.slots.getOrNull(index)) {
-                                is DeckSlot.Action -> {
-                                    actionTile(slot.actionId, cell)
-                                }
-
-                                is DeckSlot.Folder -> {
-                                    DeckButtonTile(
-                                        title = slot.name,
-                                        modifier = cell,
-                                        iconKey = FOLDER_ICON,
-                                        onClick = { openFolderId = slot.id },
-                                    )
-                                }
-
-                                null -> {
-                                    // empty cell: nothing is drawn in the control panel
-                                }
-                            }
-                        }
-                    }
-                } else {
-                    HorizontalPager(
-                        state = folderPager,
-                        modifier = Modifier.weight(1f).fillMaxWidth(),
-                        pageSpacing = 16.dp,
-                    ) { pageIndex ->
-                        val actions = folderPages.getOrElse(pageIndex) { emptyList() }
-                        DeckGridPage(columns = profile.grid.columns, rows = profile.grid.rows) { index, cell ->
-                            actions.getOrNull(index)?.let { actionTile(it, cell) }
+                HorizontalPager(
+                    state = pager,
+                    modifier = Modifier.weight(1f).fillMaxWidth(),
+                    pageSpacing = 16.dp,
+                ) { pageIndex ->
+                    val page = profile.pages[pageIndex]
+                    DeckGridPage(columns = profile.grid.columns, rows = profile.grid.rows) { index, cell ->
+                        val slot = page.slots.getOrNull(index)
+                        val button = (slot as? DeckSlot.Action)?.let { state.buttons[it.actionId] }
+                        if (button != null) {
+                            DeckButtonTile(
+                                title = button.title,
+                                modifier = cell,
+                                iconKey = button.iconKey,
+                                toggled = button.state.toggled,
+                                label = button.state.label,
+                                tone = button.state.tone.toTileTone(),
+                                enabled = button.available,
+                                onClick = {
+                                    if (state.settings.hapticFeedback) {
+                                        haptic.performHapticFeedback(
+                                            HapticFeedbackType.ContextClick,
+                                        )
+                                    }
+                                    viewModel.press(button.actionId)
+                                },
+                            )
                         }
                     }
                 }
@@ -186,11 +139,9 @@ fun DeckScreen(
 @Composable
 private fun Header(
     state: DeckUiState,
-    title: String,
+    pageName: String,
     pageCount: Int,
     currentPage: Int,
-    inFolder: Boolean,
-    onBack: () -> Unit,
     onChooseProfile: () -> Unit,
     onOpenComputers: () -> Unit,
     onMessageShown: () -> Unit,
@@ -206,19 +157,11 @@ private fun Header(
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        if (inFolder) {
-            DeckButton(
-                text = stringResource(R.string.deck_back),
-                onClick = onBack,
-                emphasis = DeckEmphasis.SECONDARY,
-            )
-        } else {
-            DeckButton(
-                text = state.profile?.name.orEmpty(),
-                onClick = onChooseProfile,
-                emphasis = DeckEmphasis.SECONDARY,
-            )
-        }
+        DeckButton(
+            text = state.profile?.name.orEmpty(),
+            onClick = onChooseProfile,
+            emphasis = DeckEmphasis.SECONDARY,
+        )
         Row(Modifier.weight(1f), horizontalArrangement = Arrangement.Center) {
             val notice = state.message
             when {
@@ -234,7 +177,7 @@ private fun Header(
                 }
 
                 else -> {
-                    DeckText(title, style = DeckTextStyle.TITLE)
+                    DeckText(pageName, style = DeckTextStyle.TITLE)
                 }
             }
         }

@@ -83,15 +83,18 @@ class DeckViewModel(
                 profiles = all,
                 buttons =
                     profile
-                        ?.actionIds
-                        ?.associateWith { actionId ->
-                            ButtonModels.build(
-                                actionId,
-                                liveData.known,
-                                liveData.states,
-                                liveData.liveIds,
-                                connected = liveData.connection is ConnectionState.Connected,
-                            )
+                        ?.pages
+                        ?.flatMap { it.slots }
+                        ?.filterIsInstance<DeckSlot.Action>()
+                        ?.associate { slot ->
+                            slot.actionId to
+                                ButtonModels.build(
+                                    slot.actionId,
+                                    liveData.known,
+                                    liveData.states,
+                                    liveData.liveIds,
+                                    connected = liveData.connection is ConnectionState.Connected,
+                                )
                         }.orEmpty(),
                 connection = liveData.connection,
                 settings = appSettings,

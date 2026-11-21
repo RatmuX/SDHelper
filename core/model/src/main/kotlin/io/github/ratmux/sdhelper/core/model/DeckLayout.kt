@@ -16,27 +16,15 @@ data class GridSize(
     }
 }
 
-/** What a grid cell holds: a button that runs an action, or a folder that opens a grid of such buttons. */
+/**
+ * What a grid cell holds. Only actions exist; the stored form keeps a type discriminator so other kinds can be added
+ * without breaking saved layouts (folders were tried and removed, see ADR-0012).
+ */
 sealed interface DeckSlot {
     data class Action(
         /** `providerId/actionId` as published by the computer. */
         val actionId: String,
     ) : DeckSlot
-
-    /**
-     * A button that opens a grid of action buttons. Folders hold only actions (they do not nest) and are not tied
-     * to the grid: [actions] is a plain ordered list shown row by row in the profile's grid, on as many swipeable
-     * pages as needed, so changing the grid size never has to move anything inside a folder.
-     */
-    data class Folder(
-        val id: String,
-        val name: String,
-        val actions: List<String> = emptyList(),
-    ) : DeckSlot {
-        /** The folder's buttons cut into pages of [capacity]; always at least one (possibly empty) page. */
-        fun pages(capacity: Int): List<List<String>> =
-            if (capacity <= 0 || actions.isEmpty()) listOf(emptyList()) else actions.chunked(capacity)
-    }
 }
 
 /** One swipeable page. [slots] has exactly one entry per grid cell, row by row; `null` is an empty cell. */
@@ -63,20 +51,7 @@ data class DeckProfile(
     fun contains(position: SlotPosition): Boolean =
         position.index in 0 until grid.capacity && position.page in pages.indices
 
-    /** Every action id the layout uses, also inside folders. */
-    val actionIds: Set<String>
-        get() =
-            pages
-                .flatMap { it.slots }
-                .flatMap { slot ->
-                    when (slot) {
-                        is DeckSlot.Action -> listOf(slot.actionId)
-                        is DeckSlot.Folder -> slot.actions
-                        null -> emptyList()
-                    }
-                }.toSet()
-
-    /** Number of cells that hold something (a folder counts as one) on all pages. */
+    /** Number of buttons placed on all pages. */
     val buttonCount: Int get() = pages.sumOf { page -> page.slots.count { it != null } }
 }
 
@@ -89,9 +64,6 @@ data class SlotPosition(
 object LayoutLimits {
     const val MAX_PAGES = 8
     const val MAX_NAME_LENGTH = 24
-
-    /** Buttons in one folder; at most a few pages of the largest grid. */
-    const val MAX_FOLDER_ACTIONS = 36
 }
 
 object LayoutIds {
